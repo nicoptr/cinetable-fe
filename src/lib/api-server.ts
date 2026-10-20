@@ -2,7 +2,7 @@ import { cookies, headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { safeNext } from "./nav";
 
-const BACKEND = process.env.BACKEND_URL ?? "http://localhost:5000";
+export const BACKEND = process.env.BACKEND_URL ?? "http://localhost:5000";
 
 /** Server: chiama il backend inoltrando il cookie della richiesta, mai in cache. */
 export async function apiServer<T>(path: string): Promise<T> {

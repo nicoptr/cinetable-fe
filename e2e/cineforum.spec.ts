@@ -39,11 +39,14 @@ test("membro già registrato accetta dalla pagina Inviti", async ({ page }) => {
   seed("base");
   await loginAs(page, "carla");
   await page.getByRole("button", { name: "Menu" }).click();
-  await page.getByRole("link", { name: /Inviti/ }).click();
+  await page.getByRole("link", { name: "Inviti (1)" }).click();
   await expect(page.getByText(/Ti invita dario/)).toBeVisible();
   await expect(page.getByRole("heading", { name: "Cineclub di Dario" })).toBeVisible();
   await page.getByRole("button", { name: "Accetta" }).click();
   await expect(page).toHaveURL(/\/cineforums\/2$/);
+  // il conteggio nel menu si aggiorna senza ricaricare la pagina
+  await page.getByRole("button", { name: "Menu" }).click();
+  await expect(page.getByRole("link", { name: "Inviti", exact: true })).toBeVisible();
   await page.goto("/cineforums");
   await expect(page.getByRole("link", { name: /Cineclub di Dario/ })).toContainText("Membro");
 });
@@ -64,4 +67,17 @@ test("logout dal menu → home", async ({ page }) => {
   await page.getByRole("button", { name: "Esci" }).click();
   await expect(page).toHaveURL("/");
   await expect(page.getByRole("link", { name: "Accedi" })).toBeVisible();
+});
+
+test("menu: Escape chiude e rida il focus al bottone; id non numerico → 404", async ({ page }) => {
+  seed("base");
+  await loginAs(page, "anna");
+  const menu = page.getByRole("button", { name: "Menu" });
+  await menu.click();
+  await expect(page.getByRole("navigation", { name: "Menu principale" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("navigation", { name: "Menu principale" })).toBeHidden();
+  await expect(menu).toBeFocused();
+  const res = await page.goto("/cineforums/abc");
+  expect(res?.status()).toBe(404);
 });

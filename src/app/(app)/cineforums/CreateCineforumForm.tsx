@@ -1,10 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Button, Field, Notice } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 
 export function CreateCineforumForm() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -16,9 +18,8 @@ export function CreateCineforumForm() {
     setError(null);
     try {
       const c = await api<{ id: number }>("/cineforums", { method: "POST", body: { name: name.trim(), description: description.trim() || undefined } });
-      // ricarica piena: l'elenco e il menu si rileggono dal server
-      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-      window.location.assign(`/cineforums/${c.id}`);
+      router.push(`/cineforums/${c.id}`);
+      router.refresh();
     } catch (err) {
       setError((err as ApiError).message);
       setPending(false);

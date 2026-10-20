@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Button, Field, Notice } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 
@@ -28,6 +28,12 @@ function useSubmit(run: () => Promise<void>, done: string) {
 export function ProfileForm({ username: u, avatarUrl: a }: { username: string; avatarUrl: string }) {
   const [username, setUsername] = useState(u);
   const [avatarUrl, setAvatarUrl] = useState(a);
+  const [preview, setPreview] = useState(a.startsWith("https://") ? a : "");
+  // l'anteprima parte dopo una pausa o al blur, non a ogni tasto
+  useEffect(() => {
+    const t = setTimeout(() => setPreview(avatarUrl.startsWith("https://") ? avatarUrl : ""), 600);
+    return () => clearTimeout(t);
+  }, [avatarUrl]);
   const { submit, pending, notice } = useSubmit(
     () => api("/users/me", { method: "PATCH", body: { username: username.trim(), avatarUrl: avatarUrl.trim() || null } }),
     "Profilo aggiornato",
@@ -36,10 +42,10 @@ export function ProfileForm({ username: u, avatarUrl: a }: { username: string; a
     <form onSubmit={submit}>
       {notice}
       <Field label="Nome utente" autoComplete="username" required value={username} onChange={(e) => setUsername(e.target.value)} />
-      <Field label="Avatar (URL https)" type="url" pattern="https://.*" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} />
-      {avatarUrl.startsWith("https://") && (
+      <Field label="Avatar (URL https)" type="url" pattern="https://.*" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} onBlur={() => setPreview(avatarUrl.startsWith("https://") ? avatarUrl : "")} />
+      {preview && (
         // eslint-disable-next-line @next/next/no-img-element -- anteprima di un URL esterno arbitrario
-        <img src={avatarUrl} alt="Anteprima avatar" className="mb-5 size-16 rounded-full border border-line object-cover" />
+        <img src={preview} alt="Anteprima avatar" className="mb-5 size-16 rounded-full border border-line object-cover" />
       )}
       <Button type="submit" pending={pending} pendingLabel="Salvataggio…" className="w-full">
         Salva il profilo
