@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: { default: "Cinofili", template: "%s · Cinofili" },
   description: "Il gioco del cineforum: candida un film in segreto, vota, scopri i vincitori alla serata finale.",
   // solo la home è indicizzabile (la sovrascrive in page.tsx)
