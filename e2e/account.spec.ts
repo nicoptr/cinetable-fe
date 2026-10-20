@@ -8,6 +8,8 @@ test("login e ritorno alla pagina richiesta", async ({ page }) => {
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Accedi" }).click();
   await page.waitForURL("**/profile");
+  await expect(page.getByRole("heading", { name: "Profilo" })).toBeVisible();
+  await expect(page.getByLabel("Nome utente")).toHaveValue("anna");
   await expectNoHorizontalScroll(page);
 });
 
@@ -54,6 +56,7 @@ test("registrazione da invito: email bloccata e si entra nel cineforum", async (
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Crea l'account" }).click();
   await page.waitForURL(/\/cineforums\/1$/);
+  await expect(page.getByRole("heading", { name: "Cinofili del giovedì" })).toBeVisible();
 });
 
 test("verifica email con il token del seed → dentro l'app", async ({ page }) => {
@@ -61,6 +64,7 @@ test("verifica email con il token del seed → dentro l'app", async ({ page }) =
   await page.goto(`/verify-email?token=${VERIFY_TOKEN}`);
   await expect(page.getByRole("heading", { name: "Email confermata" })).toBeVisible();
   await page.waitForURL("**/cineforums");
+  await expect(page.getByRole("heading", { name: "I miei cineforum" })).toBeVisible();
 });
 
 test("verifica email con token non valido → errore", async ({ page }) => {
@@ -123,4 +127,6 @@ test("con la sessione la home offre 'Vai ai tuoi cineforum'", async ({ page }) =
   await loginAs(page, "anna");
   await page.goto("/");
   await expect(page.getByRole("link", { name: "Vai ai tuoi cineforum" })).toHaveAttribute("href", "/cineforums");
+  await page.getByRole("link", { name: "Vai ai tuoi cineforum" }).click();
+  await expect(page.getByRole("heading", { name: "I miei cineforum" })).toBeVisible();
 });
