@@ -56,6 +56,8 @@ export function ConfirmButton({ onConfirm, confirmLabel = "Tocca di nuovo per co
     setPending(true);
     try {
       await onConfirm();
+    } catch {
+      // l'errore lo mostra il chiamante; qui basta non lasciarlo senza gestione
     } finally {
       setPending(false);
     }

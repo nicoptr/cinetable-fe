@@ -1,3 +1,5 @@
+import { PUBLIC_PATHS, safeNext } from "./nav";
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -28,9 +30,10 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
   const data = await res.json().catch(() => null);
   if (res.ok) return data as T;
 
-  if (res.status === 401) {
+  // login sbagliato o sonda /auth/me su una pagina pubblica: il chiamante mostra l'errore
+  if (res.status === 401 && !path.startsWith("/auth/") && !PUBLIC_PATHS.includes(location.pathname)) {
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- ricarica piena: da fuori sessione si riparte da zero
-    window.location.assign("/login?next=" + encodeURIComponent(location.pathname + location.search));
+    window.location.assign("/login?next=" + encodeURIComponent(safeNext(location.pathname + location.search)));
   }
   throw new ApiError(data?.message ?? FALLBACK, res.status, data?.code ?? String(res.status));
 }

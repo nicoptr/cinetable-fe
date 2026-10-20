@@ -1,5 +1,19 @@
 import { execFileSync } from "node:child_process";
-import { expect, type Page } from "@playwright/test";
+import { randomInt } from "node:crypto";
+import path from "node:path";
+import { test as base, expect, type Page } from "@playwright/test";
+
+export { expect };
+
+/**
+ * `test` di tutti gli spec: ogni test manda un `X-Forwarded-For` suo (il backend e2e ha TRUST_PROXY=true),
+ * così i rate limit per IP del backend (es. 10 login/min) non si sommano tra un test e l'altro.
+ */
+export const test = base.extend({
+  extraHTTPHeaders: async ({ extraHTTPHeaders }, provide) => {
+    await provide({ ...extraHTTPHeaders, "x-forwarded-for": `10.${randomInt(256)}.${randomInt(256)}.${randomInt(1, 255)}` });
+  },
+});
 
 /** Token in chiaro fissi del seed (cinofili-be/scripts/e2e-seed.js): nel DB c'è solo l'hash. */
 export const INVITE_TOKEN_NEW = "e2e0000000000000000000000000000000000000000000000000000000000001"; // ospite@e2e.it → Cinofili del giovedì
@@ -12,7 +26,7 @@ export type Player = "anna" | "bruno" | "carla" | "dario";
 
 /** Svuota il DB e2e e lo ricrea nello scenario dato (id e ordine sempre uguali). */
 export function seed(scenario: Scenario) {
-  execFileSync("node", ["../cinofili-be/scripts/e2e-seed.js", scenario], { stdio: "pipe" });
+  execFileSync("node", [path.resolve(__dirname, "../../cinofili-be/scripts/e2e-seed.js"), scenario], { stdio: "pipe" });
 }
 
 /** Login dalla UI di `/login`. */

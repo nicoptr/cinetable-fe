@@ -1,15 +1,17 @@
 import { cookies, headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import { safeNext } from "./nav";
+
+const BACKEND = process.env.BACKEND_URL ?? "http://localhost:5000";
 
 /** Server: chiama il backend inoltrando il cookie della richiesta, mai in cache. */
 export async function apiServer<T>(path: string): Promise<T> {
-  const res = await fetch(`${process.env.BACKEND_URL}/sub/api${path}`, {
+  const res = await fetch(`${BACKEND}/sub/api${path}`, {
     headers: { cookie: (await cookies()).toString() },
     cache: "no-store",
   });
   if (res.status === 401) {
-    const current = (await headers()).get("x-pathname") ?? "/";
-    redirect("/login?next=" + encodeURIComponent(current));
+    redirect("/login?next=" + encodeURIComponent(safeNext((await headers()).get("x-pathname"))));
   }
   if (res.status === 404) notFound();
   if (res.status === 204) return undefined as T;
