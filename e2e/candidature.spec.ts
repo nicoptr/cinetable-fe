@@ -107,3 +107,42 @@ test("anna toglie dalla rassegna chi non ha un film valido", async ({ page }) =>
   await expect(page.getByRole("listitem").filter({ hasText: "dario" })).toHaveCount(0);
   await expect(page.getByText("0 film su 3")).toBeVisible();
 });
+
+test("risposta lenta di una vecchia ricerca non sovrascrive la nuova", async ({ page }) => {
+  seed("open");
+  await page.route("**/api/movies/search**", async (r) => {
+    const q = new URL(r.request().url()).searchParams.get("q");
+    if (q === "ghos") {
+      await new Promise((res) => setTimeout(res, 2500));
+      return r.fulfill({ json: { results: [FILMS[2]], totalPages: 1 } });
+    }
+    return r.fulfill({ json: { results: [FILMS[1]], totalPages: 1 } });
+  });
+  await loginAs(page, "bruno");
+  await page.goto(SEASON);
+  const box = page.getByLabel("Cerca un film");
+  await box.fill("ghos");
+  await page.waitForTimeout(600); // la prima richiesta è partita
+  await box.fill("fight");
+  await expect(page.getByRole("button", { name: /Fight Club/ })).toBeVisible();
+  await page.waitForTimeout(3000);
+  await expect(page.getByRole("button", { name: /Fight Club/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Ghostbusters/ })).toHaveCount(0);
+});
+
+test("Altri risultati aggiunge la pagina 2 dello stesso termine", async ({ page }) => {
+  seed("open");
+  await page.route("**/api/movies/search**", (r) => {
+    const u = new URL(r.request().url());
+    const p = u.searchParams.get("page");
+    return r.fulfill({ json: { results: p === "2" ? [FILMS[3]] : [FILMS[0]], totalPages: 2 } });
+  });
+  await loginAs(page, "bruno");
+  await page.goto(SEASON);
+  const box = page.getByLabel("Cerca un film");
+  await box.fill("film");
+  await expect(page.getByRole("button", { name: /La cosa/ })).toBeVisible();
+  await page.getByRole("button", { name: "Altri risultati" }).click();
+  await expect(page.getByRole("button", { name: /Nuovo Cinema Paradiso/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /La cosa/ })).toBeVisible();
+});

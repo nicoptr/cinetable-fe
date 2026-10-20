@@ -13,7 +13,11 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [closeAt, setCloseAt] = useState(isoToRomeLocal(season.candidaturesCloseAt));
+  const serverCloseAt = isoToRomeLocal(season.candidaturesCloseAt);
+  const [edit, setEdit] = useState({ from: serverCloseAt, value: serverCloseAt });
+  // segue il valore del server dopo router.refresh()
+  const closeAt = edit.from === serverCloseAt ? edit.value : serverCloseAt;
+  const setCloseAt = (value: string) => setEdit({ from: serverCloseAt, value });
   const base = `/cineforums/${cineforumId}/seasons/${season.id}`;
   const { valid, expected } = season.candidatures;
   const passed = new Date(season.candidaturesCloseAt) <= new Date();
@@ -35,6 +39,7 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
   return (
     <>
       <p>Candidature aperte fino a {formatDateTime(season.candidaturesCloseAt)}</p>
+      {season.finalNightAt && <p className="text-muted">Serata finale {formatDateTime(season.finalNightAt)}</p>}
       <p className="mb-6 text-muted">
         {valid} film su {expected}
       </p>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Field, Notice, Poster } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 import type { MovieSearchResult, MovieView } from "@/lib/types";
@@ -13,31 +13,52 @@ export function MovieSearch({ candidatureUrl, onDone }: { candidatureUrl: string
   const [q, setQ] = useState("");
   const [movies, setMovies] = useState<MovieView[]>([]);
   const [page, setPage] = useState(1);
+  const [term, setTerm] = useState(""); // il termine che ha prodotto i risultati mostrati
+  const seq = useRef(0); // solo l'ultima richiesta può aggiornare lo stato
   const [totalPages, setTotalPages] = useState(0);
   const [pick, setPick] = useState<MovieView | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function load(term: string, p: number) {
+  async function load(t: string, p: number) {
+    const id = ++seq.current;
     setBusy(true);
     setError(null);
     try {
-      const r = await api<MovieSearchResult>(`/movies/search?q=${encodeURIComponent(term)}&page=${p}`);
+      const r = await api<MovieSearchResult>(`/movies/search?q=${encodeURIComponent(t)}&page=${p}`);
+      if (id !== seq.current) return;
       setMovies((prev) => (p === 1 ? r.results : [...prev, ...r.results]));
       setPage(p);
+      setTerm(t);
       setTotalPages(r.totalPages);
     } catch (e) {
+      if (id !== seq.current) return;
+      if (p === 1) {
+        setMovies([]);
+        setTotalPages(0);
+      }
       setError(msg(e));
     } finally {
+      if (id === seq.current) setBusy(false);
+    }
+  }
+
+  function change(value: string) {
+    setQ(value);
+    if (value.trim().length < 2) {
+      seq.current++; // scarta eventuali risposte in volo
+      setMovies([]);
+      setTotalPages(0);
+      setError(null);
       setBusy(false);
     }
   }
 
   useEffect(() => {
-    const term = q.trim();
-    if (term.length < 2) return;
-    const t = setTimeout(() => void load(term, 1), 400);
-    return () => clearTimeout(t);
+    const t = q.trim();
+    if (t.length < 2) return;
+    const timer = setTimeout(() => void load(t, 1), 400);
+    return () => clearTimeout(timer);
   }, [q]);
 
   async function confirm() {
@@ -57,7 +78,7 @@ export function MovieSearch({ candidatureUrl, onDone }: { candidatureUrl: string
 
   return (
     <div>
-      <Field label="Cerca un film" value={q} onChange={(e) => setQ(e.target.value)} autoComplete="off" />
+      <Field label="Cerca un film" value={q} onChange={(e) => change(e.target.value)} autoComplete="off" />
       {error && <Notice tone="error">{error}</Notice>}
       {pick && (
         <div className="mb-5 border-l-2 border-gold py-1 pl-3">
@@ -87,7 +108,7 @@ export function MovieSearch({ candidatureUrl, onDone }: { candidatureUrl: string
       </ul>
       {totalPages > page && (
         <div className="mt-4">
-          <Button variant="secondary" disabled={busy} onClick={() => load(q.trim(), page + 1)}>
+          <Button variant="secondary" disabled={busy} onClick={() => load(term, page + 1)}>
             Altri risultati
           </Button>
         </div>
