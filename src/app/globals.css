@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* Stile A2 · elegante minimale */
+@theme {
+  --color-bg: #1a1718;
+  --color-surface: #211d1e;
+  --color-line: #2e292a;
+  --color-ink: #ece5dc;
+  --color-muted: rgb(236 229 220 / 0.65);
+  --color-gold: #c9a24a;
+  --color-error: #d9776b;
+  --color-success: #7fc79a;
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  font-weight: normal;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
