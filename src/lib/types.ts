@@ -12,3 +12,7 @@ export type InvitationView = Ok<"listInvitations">[number];
 export type Category = Ok<"listCategories">[number];
 export type Award = Ok<"listAwards">[number];
 export type SeasonView = Ok<"getSeason">;
+export type MyCandidature = Ok<"getMyCandidature">;
+export type CandidatureProgress = Ok<"getCandidatureProgress">;
+export type MovieSearchResult = Ok<"searchMovies">;
+export type MovieView = MovieSearchResult["results"][number];

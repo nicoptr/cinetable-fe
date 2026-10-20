@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import { PageTitle } from "@/components/ui";
 import { apiServer } from "@/lib/api-server";
 import { formatDateTime } from "@/lib/format";
-import type { Award, Category, CineforumDetail, SeasonView } from "@/lib/types";
+import type { Award, Category, CandidatureProgress, CineforumDetail, MyCandidature, SeasonView } from "@/lib/types";
 import { Draft } from "./_draft";
+import { Open } from "./_open";
 
 const STATUS: Record<SeasonView["status"], string> = {
   DRAFT: "Bozza",
@@ -22,10 +23,12 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
     <>
       <PageTitle>{s.name}</PageTitle>
       <p className="mb-1">{STATUS[s.status]}</p>
-      <p className="mb-6 text-muted">
-        Candidature fino al {formatDateTime(s.candidaturesCloseAt)}
-        {s.finalNightAt && ` · serata finale ${formatDateTime(s.finalNightAt)}`}
-      </p>
+      {s.status !== "OPEN" && (
+        <p className="mb-6 text-muted">
+          Candidature fino al {formatDateTime(s.candidaturesCloseAt)}
+          {s.finalNightAt && ` · serata finale ${formatDateTime(s.finalNightAt)}`}
+        </p>
+      )}
       {s.status === "DRAFT" ? (
         <Draft
           cineforumId={id}
@@ -33,8 +36,15 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
           // le liste servono solo al form di modifica del presidente
           {...(president && (await editorData(id)))}
         />
+      ) : s.status === "OPEN" ? (
+        <Open
+          cineforumId={id}
+          season={s}
+          mine={s.isParticipant ? await apiServer<MyCandidature>(`/cineforums/${id}/seasons/${seasonId}/candidature`) : null}
+          progress={president ? await apiServer<CandidatureProgress>(`/cineforums/${id}/seasons/${seasonId}/progress`) : null}
+        />
       ) : (
-        // OPEN, SCREENING, FINAL e DONE: viste nei task successivi
+        // SCREENING, FINAL e DONE: viste nei task successivi
         <p className="text-muted">Questa fase della rassegna sarà disponibile a breve.</p>
       )}
     </>
