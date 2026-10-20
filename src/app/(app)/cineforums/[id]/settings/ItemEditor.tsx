@@ -89,7 +89,7 @@ export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey
                 >
                   Modifica
                 </Button>
-                <ConfirmButton variant="secondary" disabled={busy} aria-label={`Elimina ${i.name}`} onConfirm={() => run(i.id, () => api(`${path}/${i.id}`, { method: "DELETE" }))}>
+                <ConfirmButton variant="secondary" disabled={busy} onConfirm={() => run(i.id, () => api(`${path}/${i.id}`, { method: "DELETE" }))}>
                   Elimina
                 </ConfirmButton>
               </div>
@@ -99,10 +99,15 @@ export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey
       </ul>
       <form onSubmit={add}>
         <Field label={nameLabel} value={name} onChange={(e) => setName(e.target.value)} />
-        <Field label={extraLabel} textarea value={extra} error={err(0)} onChange={(e) => setExtra(e.target.value)} />
+        <Field label={extraLabel} textarea value={extra} onChange={(e) => setExtra(e.target.value)} />
         <Button type="submit" pending={busy} disabled={busy}>
           {addLabel}
         </Button>
+        {err(0) && (
+          <p role="alert" className="mt-2 text-error">
+            {err(0)}
+          </p>
+        )}
       </form>
     </section>
   );

@@ -6,6 +6,7 @@ test("presidente invita due email, le vede In attesa, ne revoca una", async ({ p
   await page.goto("/cineforums/1/members");
   await page.getByLabel("Invita per email").fill("uno@e2e.it, due@e2e.it");
   await page.getByRole("button", { name: "Invita" }).click();
+  await expect(page.getByText("Inviti inviati: 2")).toBeVisible();
   const uno = page.getByRole("listitem").filter({ hasText: "uno@e2e.it" });
   await expect(uno).toContainText("In attesa");
   await expect(page.getByRole("listitem").filter({ hasText: "due@e2e.it" })).toContainText("In attesa");
@@ -48,4 +49,26 @@ test("cineforum di cui non faccio parte → pagina Non trovato", async ({ page }
   await loginAs(page, "bruno");
   await page.goto("/cineforums/2");
   await expect(page.getByRole("heading", { name: "Non trovato" })).toBeVisible();
+});
+
+test("Rimanda mostra l'esito nella riga, Revoca la segna Revocato", async ({ page }) => {
+  seed("base");
+  await loginAs(page, "anna");
+  await page.goto("/cineforums/1/members");
+  const row = page.getByRole("listitem").filter({ hasText: "ospite@e2e.it" });
+  await row.getByRole("button", { name: "Rimanda" }).click();
+  await expect(row.getByText("Invito rimandato")).toBeVisible();
+  await row.getByRole("button", { name: "Revoca" }).click();
+  await row.getByRole("button", { name: "Tocca di nuovo per confermare" }).click();
+  await expect(row).toContainText("Revocato");
+});
+
+test("categoria usata in una rassegna: il 409 compare nella sua riga", async ({ page }) => {
+  seed("open");
+  await loginAs(page, "anna");
+  await page.goto("/cineforums/1/settings");
+  const row = page.getByRole("listitem").filter({ hasText: "Horror anni '80" });
+  await row.getByRole("button", { name: "Elimina" }).click();
+  await row.getByRole("button", { name: "Tocca di nuovo per confermare" }).click();
+  await expect(row.getByRole("alert")).toContainText("Categoria usata in una rassegna");
 });
