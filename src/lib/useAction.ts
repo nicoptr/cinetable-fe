@@ -25,5 +25,5 @@ export function useAction() {
       setBusy(false);
     }
   }
-  return { busy, error, run };
+  return { busy, error, setError, run };
 }

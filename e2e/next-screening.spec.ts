@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 import { expect, expectNoHorizontalScroll, loginAs, seed, test, type Player } from "./helpers";
-import { formatLongDateTime, isoToRomeLocal, romeLocalToIso } from "../src/lib/format";
+import { formatDateTime, formatLongDateTime, isoToRomeLocal, romeLocalToIso } from "../src/lib/format";
 
 const SEASON = "/cineforums/1/seasons/1";
 const API = `/api${SEASON}`;
@@ -55,6 +55,8 @@ test("anna programma la proiezione prima di svelare, la modifica, svela e il fil
   expect(s.nextScreening).toBeNull();
   expect(s.program[0]).toMatchObject({ screeningAt: second.iso, location: "Casa di Anna" });
   await expect(page.getByRole("list", { name: "Programma" }).getByRole("link")).toContainText("Casa di Anna");
+  await page.goto(`${SEASON}/films/1`);
+  await expect(page.getByText(`Proiezione ${formatDateTime(second.iso)} · Casa di Anna`)).toBeVisible();
 });
 
 test("una data nel passato: l'errore resta sotto il campo", async ({ page }) => {

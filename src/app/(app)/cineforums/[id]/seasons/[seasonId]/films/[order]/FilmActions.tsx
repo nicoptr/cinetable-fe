@@ -28,10 +28,10 @@ export function PlanScreening({ base, screeningAt, location }: { base: string; s
   );
 }
 
-/** true dall'orario della proiezione in poi; un timer lo fa scattare da solo, poi aggiorna la vista del server. */
-function useScreened(screeningAt: string | null) {
+/** true dall'orario della proiezione in poi: parte dal valore del server, poi un timer lo fa scattare da solo e aggiorna la vista. */
+function useScreened(screeningAt: string | null, initiallyScreened: boolean) {
   const router = useRouter();
-  const [screened, setScreened] = useState(() => screeningAt != null && Date.parse(screeningAt) <= Date.now());
+  const [screened, setScreened] = useState(initiallyScreened);
   useEffect(() => {
     if (!screeningAt || screened) return;
     const wait = Date.parse(screeningAt) - Date.now();
@@ -45,10 +45,12 @@ function useScreened(screeningAt: string | null) {
   return screened;
 }
 
-export function Voting({ base, screeningAt, votingOpen, votesMissing }: { base: string; screeningAt: string | null; votingOpen: boolean; votesMissing: number }) {
+type VotingProps = { base: string; screeningAt: string | null; screened: boolean; votingOpen: boolean; votesMissing: number };
+
+export function Voting({ base, screeningAt, screened: initiallyScreened, votingOpen, votesMissing }: VotingProps) {
   const { busy, error, run } = useAction();
   const [sent, setSent] = useState<number | null>(null);
-  const screened = useScreened(screeningAt);
+  const screened = useScreened(screeningAt, initiallyScreened);
   return (
     <Section>
       {error && <Notice tone="error">{error}</Notice>}

@@ -21,6 +21,7 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
   const base = `/cineforums/${cineforumId}/seasons/${season.id}`;
   const { valid, expected } = season.candidatures;
   const passed = new Date(season.candidaturesCloseAt) <= new Date();
+  const started = passed && valid === expected;
 
   /** Senza `quiet` l'errore lo mostra l'avviso di api(); con `quiet` lo mostra il chiamante. */
   async function run(fn: () => Promise<void>) {
@@ -74,8 +75,7 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
         </>
       )}
 
-      {/* a gioco iniziato (candidature chiuse e tutti i film validi) non manca più nessuno */}
-      {progress && !(passed && valid === expected) && (
+      {progress && !started && (
         <Section title="Chi manca">
           {progress.missing.length === 0 ? (
             <p className="text-muted">Nessuno: tutti hanno un film valido.</p>

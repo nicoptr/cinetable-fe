@@ -15,7 +15,7 @@ type Next = NonNullable<SeasonView["nextScreening"]>;
  * `base` solo per il presidente, quando c'è un film da svelare: allora si programma e si modifica.
  */
 export function NextScreening({ base, next }: { base?: string; next: Next | null }) {
-  const { busy, error, run } = useAction();
+  const { busy, error, setError, run } = useAction();
   const [editing, setEditing] = useState(false);
   if (!base && !next) return null;
 
@@ -30,7 +30,7 @@ export function NextScreening({ base, next }: { base?: string; next: Next | null
       <Section title="Prossima proiezione" className="mb-8">
         {summary}
         {base && (
-          <Button variant="secondary" onClick={() => setEditing(true)} className="mt-2">
+          <Button variant="secondary" disabled={busy} onClick={() => setEditing(true)} className="mt-2">
             Modifica
           </Button>
         )}
@@ -50,7 +50,15 @@ export function NextScreening({ base, next }: { base?: string; next: Next | null
         }}
       >
         {editing && (
-          <Button variant="secondary" onClick={() => setEditing(false)} className="mt-2 w-full">
+          <Button
+            variant="secondary"
+            disabled={busy}
+            onClick={() => {
+              setError(null);
+              setEditing(false);
+            }}
+            className="mt-2 w-full"
+          >
             Annulla
           </Button>
         )}
