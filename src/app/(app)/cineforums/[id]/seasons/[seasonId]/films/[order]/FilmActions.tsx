@@ -12,15 +12,17 @@ function useAction() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  async function run<T>(fn: () => Promise<T>) {
+  /** true se è andata a buon fine (anche con 204 e corpo vuoto). */
+  async function run(fn: () => Promise<unknown>) {
     setBusy(true);
     setError(null);
     try {
-      const out = await fn();
+      await fn();
       router.refresh();
-      return out;
+      return true;
     } catch (err) {
       setError((err as ApiError).message);
+      return false;
     } finally {
       setBusy(false);
     }
@@ -69,8 +71,7 @@ export function Voting({ base, votingOpen, votesMissing }: { base: string; votin
               pending={busy}
               pendingLabel="Invio…"
               onClick={async () => {
-                const r = await run(() => api<{ sent: number }>(`${base}/vote-reminder`, { method: "POST" }));
-                if (r) setSent(r.sent);
+                await run(async () => setSent((await api<{ sent: number }>(`${base}/vote-reminder`, { method: "POST" })).sent));
               }}
             >
               Sollecita
@@ -88,6 +89,8 @@ export function VoteForm({ base, awards }: { base: string; awards: SeasonView["a
   const [sent, setSent] = useState(false);
   // solo i cursori toccati (primo evento `input`, anche da tastiera)
   const [values, setValues] = useState<Record<number, number>>({});
+  // un tocco sul valore di riposo non genera `input`: conta anche il pointerup (non il pointercancel di uno scroll)
+  const touch = (awardId: number, value: number) => setValues((v) => ({ ...v, [awardId]: value }));
   const allTouched = awards.every((a) => values[a.id] !== undefined);
   return (
     <section>
@@ -108,7 +111,8 @@ export function VoteForm({ base, awards }: { base: string; awards: SeasonView["a
               value={values[a.id] ?? 50}
               aria-valuetext={values[a.id] === undefined ? "Non ancora votato" : undefined}
               disabled={sent}
-              onChange={(e) => setValues({ ...values, [a.id]: Number(e.target.value) })}
+              onChange={(e) => touch(a.id, Number(e.target.value))}
+              onPointerUp={(e) => touch(a.id, Number(e.currentTarget.value))}
               className={`h-11 flex-1 accent-gold ${values[a.id] === undefined ? "opacity-40" : ""}`}
             />
             <output htmlFor={`award-${a.id}`} className="w-10 text-right font-serif text-2xl text-gold tabular-nums">

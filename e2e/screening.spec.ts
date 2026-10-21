@@ -131,6 +131,27 @@ test("programmo la proiezione e apro il voto; bruno vota con gli slider", async 
   await expect(page.getByText("Sollecito inviato a 2 persone")).toBeVisible();
 });
 
+test("un tocco sul cursore a riposo (50) conta come voto", async ({ page }) => {
+  seed("screening");
+  await loginAs(page, "anna");
+  const item: Item = await (await page.request.post(`${API}/reveal-next`)).json();
+  const yesterday = new Date(Date.now() - 86400000).toISOString();
+  expect((await page.request.patch(`${API}/program/1/screening`, { data: { screeningAt: yesterday, location: "Sala Verdi" } })).ok()).toBe(true);
+  expect((await page.request.post(`${API}/program/1/open-voting`)).ok()).toBe(true);
+  await switchTo(page, PROPOSER[item.movie.tmdbId] === "bruno" ? "carla" : "bruno");
+  await page.goto(`${SEASON}/films/1`);
+
+  const send = page.getByRole("button", { name: "Invia i voti" });
+  const outputs = page.locator("output");
+  await page.getByRole("slider", { name: /Miglior film/ }).click(); // al centro: il valore resta 50, nessun `input`
+  await expect(outputs).toHaveText(["50", "–"]);
+  await expect(send).toBeDisabled();
+  await page.getByRole("slider", { name: /Miglior regia/ }).click();
+  await expect(outputs).toHaveText(["50", "50"]);
+  await expect(send).toBeEnabled();
+  await expect(page.getByText("Muovi tutti i cursori per votare")).toHaveCount(0);
+});
+
 test("il proponente vede 'Questo è il tuo film'", async ({ page }) => {
   seed("final"); // ordine fisso: 2 = Ghostbusters di bruno
   await loginAs(page, "bruno");
