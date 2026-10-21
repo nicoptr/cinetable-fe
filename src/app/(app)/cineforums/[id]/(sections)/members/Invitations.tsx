@@ -61,7 +61,6 @@ export function Invitations({ cineforumId, initial }: { cineforumId: string; ini
 
   return (
     <>
-      <h2 className="mb-3 font-serif text-2xl">Inviti</h2>
       <form onSubmit={invite}>
         <Field textarea label="Invita per email" hint="Una o più email, separate da virgole, spazi o a capo" value={text} onChange={(e) => setText(e.target.value)} />
         <Button type="submit" pending={busy} disabled={busy} className="w-full">

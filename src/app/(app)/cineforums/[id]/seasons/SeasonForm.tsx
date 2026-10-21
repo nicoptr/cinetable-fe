@@ -74,7 +74,6 @@ export function SeasonForm({ cineforumId, categories, awards, members, season, o
     }
   }
 
-  const settings = `/cineforums/${cineforumId}/settings`;
   return (
     <form onSubmit={submit}>
       {error && <Notice tone="error">{error}</Notice>}
@@ -82,8 +81,8 @@ export function SeasonForm({ cineforumId, categories, awards, members, season, o
       <Field label="Descrizione" textarea maxLength={500} value={description} onChange={(e) => setDescription(e.target.value)} />
       <Field label="Chiusura candidature" type="datetime-local" required value={closeAt} onChange={(e) => setCloseAt(e.target.value)} hint="Ora di Roma" />
       <Field label="Serata finale (facoltativa)" type="datetime-local" value={finalAt} onChange={(e) => setFinalAt(e.target.value)} hint="Ora di Roma" />
-      <Checks legend="Categorie" name="category" items={categories.map((c) => ({ id: c.id, label: c.name }))} selected={cats} toggle={toggle(setCats)} manage={settings} />
-      <Checks legend="Premi" name="award" items={awards.map((a) => ({ id: a.id, label: a.name }))} selected={aws} toggle={toggle(setAws)} manage={settings} />
+      <Checks legend="Categorie" name="category" items={categories.map((c) => ({ id: c.id, label: c.name }))} selected={cats} toggle={toggle(setCats)} manage={`/cineforums/${cineforumId}/categories`} />
+      <Checks legend="Premi" name="award" items={awards.map((a) => ({ id: a.id, label: a.name }))} selected={aws} toggle={toggle(setAws)} manage={`/cineforums/${cineforumId}/awards`} />
       <Checks legend="Partecipanti" name="participant" items={members.map((m) => ({ id: m.userId, label: m.username }))} selected={users} toggle={toggle(setUsers)} />
       <div className="flex items-center gap-4">
         <Button type="submit" pending={pending} pendingLabel="Salvataggio…" className="flex-1">

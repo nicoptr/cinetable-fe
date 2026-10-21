@@ -16,12 +16,11 @@ test("presidente invita due email, le vede In attesa, ne revoca una", async ({ p
   await expectNoHorizontalScroll(page);
 });
 
-test("membro non vede Impostazioni né il form inviti", async ({ page }) => {
+test("membro non vede Nuova edizione né il form inviti; settings non esiste più", async ({ page }) => {
   seed("base");
   await loginAs(page, "bruno");
   await page.goto("/cineforums/1");
   await expect(page.getByRole("link", { name: "Membri" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Impostazioni" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Nuova edizione" })).toHaveCount(0);
   await page.goto("/cineforums/1/members");
   await expect(page.getByText("anna")).toBeVisible();
@@ -34,7 +33,8 @@ test("aggiungo un premio con la sua domanda", async ({ page }) => {
   seed("base");
   await loginAs(page, "anna");
   await page.goto("/cineforums/1");
-  await page.getByRole("link", { name: "Impostazioni" }).click();
+  await page.getByRole("link", { name: "Premi", exact: true }).click();
+  await expect(page).toHaveURL(/\/cineforums\/1\/awards$/);
   await expect(page.getByText("Miglior regia")).toBeVisible();
   await expect(page.getByLabel("Nome del premio")).toHaveCount(0);
   await page.getByRole("button", { name: "+ Nuovo premio" }).click();
@@ -51,7 +51,7 @@ test("aggiungo un premio con la sua domanda", async ({ page }) => {
 test("nuova categoria: Annulla chiude il form, Salva la aggiunge con la conferma", async ({ page }) => {
   seed("base");
   await loginAs(page, "anna");
-  await page.goto("/cineforums/1/settings");
+  await page.goto("/cineforums/1/categories");
   await page.getByRole("button", { name: "+ Nuova categoria" }).click();
   await expect(page.getByRole("heading", { name: "Nuova categoria" })).toBeVisible();
   await expect(page.getByLabel("Nome della categoria")).toBeFocused();
@@ -70,7 +70,7 @@ test("nuova categoria: Annulla chiude il form, Salva la aggiunge con la conferma
 test("modifica in linea con Salva e Annulla", async ({ page }) => {
   seed("base");
   await loginAs(page, "anna");
-  await page.goto("/cineforums/1/settings");
+  await page.goto("/cineforums/1/awards");
   await page.getByRole("button", { name: "Modifica Miglior regia" }).click();
   await page.getByLabel("Nome del premio").fill("Miglior regista");
   await page.getByRole("button", { name: "Salva" }).click();
@@ -100,7 +100,7 @@ test("Rimanda mostra l'esito nella riga, Revoca la segna Revocato", async ({ pag
 test("categoria usata in un'edizione: il 409 compare nella sua riga", async ({ page }) => {
   seed("open");
   await loginAs(page, "anna");
-  await page.goto("/cineforums/1/settings");
+  await page.goto("/cineforums/1/categories");
   const row = page.getByRole("listitem").filter({ hasText: "Horror anni '80" });
   await row.getByRole("button", { name: "Elimina" }).click();
   await row.getByRole("button", { name: "Tocca di nuovo per confermare" }).click();

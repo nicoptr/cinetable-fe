@@ -19,7 +19,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="it">
       <body className="bg-bg text-ink antialiased">
-        <div className="mx-auto flex min-h-dvh w-full max-w-[640px] flex-col px-4">
+        {/* 640px; le pagine con due colonne (data-wide) allargano tutto, header e footer compresi */}
+        <div className="mx-auto flex min-h-dvh w-full max-w-[640px] flex-col px-4 md:has-[[data-wide]]:max-w-[960px]">
           <main className="flex-1 pt-6">{children}</main>
           <Footer />
         </div>

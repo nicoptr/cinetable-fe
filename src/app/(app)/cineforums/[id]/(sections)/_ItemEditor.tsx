@@ -7,7 +7,6 @@ import { api, ApiError } from "@/lib/api";
 
 type Item = { id: number; name: string; extra: string };
 type Props = {
-  title: string;
   path: string;
   items: Item[];
   nameLabel: string;
@@ -19,8 +18,8 @@ type Props = {
   addedLabel: string;
 };
 
-/** Elenco con aggiungi, modifica in linea ed elimina: serve sia alle categorie sia ai premi. */
-export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey, newLabel, addedLabel }: Props) {
+/** Elenco con aggiungi, modifica in linea ed elimina, per il presidente: serve sia alle categorie sia ai premi. */
+export function ItemEditor({ path, items, nameLabel, extraLabel, extraKey, newLabel, addedLabel }: Props) {
   const router = useRouter();
   const [adding, setAdding] = useState(false);
   // dopo Annulla o Salva il fuoco torna su "+ Nuova …"
@@ -79,8 +78,7 @@ export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey
   const err = (row: number) => (error?.row === row ? error.message : null);
 
   return (
-    <section className="mb-10">
-      <h2 className="mb-3 font-serif text-2xl">{title}</h2>
+    <>
       <ul className="mb-6">
         {items.map((i) =>
           editing === i.id ? (
@@ -164,6 +162,20 @@ export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey
           </Button>
         </div>
       )}
-    </section>
+    </>
+  );
+}
+
+/** Lo stesso elenco in sola lettura, per i membri. */
+export function ItemList({ items }: { items: Item[] }) {
+  return (
+    <ul>
+      {items.map((i) => (
+        <li key={i.id} className="border-t border-line py-3 first:border-t-0">
+          <p className="font-serif text-lg">{i.name}</p>
+          {i.extra && <p className="text-muted">{i.extra}</p>}
+        </li>
+      ))}
+    </ul>
   );
 }
