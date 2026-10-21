@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Poster } from "@/components/ui";
 import { apiServer } from "@/lib/api-server";
@@ -19,6 +20,9 @@ export default async function FilmPage({ params }: { params: Promise<{ id: strin
 
   return (
     <>
+      <Link href={`/cineforums/${id}/seasons/${seasonId}`} className="mb-4 inline-flex min-h-11 items-center text-sm text-muted underline underline-offset-4 hover:text-gold print:hidden">
+        Torna alla rassegna
+      </Link>
       <header className="mb-8">
         <div className="mx-auto mb-5 w-52">
           <Poster movie={movie} size="lg" />

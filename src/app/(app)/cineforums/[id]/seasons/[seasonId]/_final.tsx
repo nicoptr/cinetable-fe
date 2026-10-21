@@ -36,7 +36,7 @@ export function FinalNight({
     <>
       {envelopes.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-4 font-serif text-xl">Serata finale</h2>
+          <h2 className="mb-4 font-serif text-xl">Le buste</h2>
           {envelopes.map((a) => (
             <Envelope
               key={a.id}

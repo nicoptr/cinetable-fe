@@ -64,7 +64,7 @@ export function Invitations({ cineforumId, initial }: { cineforumId: string; ini
       <h2 className="mb-3 font-serif text-2xl">Inviti</h2>
       <form onSubmit={invite}>
         <Field textarea label="Invita per email" hint="Una o più email, separate da virgole, spazi o a capo" value={text} onChange={(e) => setText(e.target.value)} />
-        <Button type="submit" pending={busy} disabled={busy}>
+        <Button type="submit" pending={busy} disabled={busy} className="w-full">
           Invita
         </Button>
         {note(0)}
@@ -83,7 +83,7 @@ export function Invitations({ cineforumId, initial }: { cineforumId: string; ini
                 <Button variant="secondary" disabled={busy} onClick={() => resend(i)}>
                   Rimanda
                 </Button>
-                <ConfirmButton variant="secondary" disabled={busy} onConfirm={() => run(i.id, () => api(`${base}/${i.id}`, { method: "DELETE" }))}>
+                <ConfirmButton variant="danger" disabled={busy} onConfirm={() => run(i.id, () => api(`${base}/${i.id}`, { method: "DELETE" }))}>
                   Revoca
                 </ConfirmButton>
               </div>

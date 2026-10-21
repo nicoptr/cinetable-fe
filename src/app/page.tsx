@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { PageTitle } from "@/components/ui";
 
 const TITLE = "Cinofili";
 const DESCRIPTION = "Il cineforum tra amici, con la suspense degli Oscar: candida un film in segreto, scoprilo una sera alla volta, vota e apri la busta.";
@@ -26,7 +25,7 @@ export default async function Home() {
   const loggedIn = (await cookies()).has("cinofili_token");
   return (
     <>
-      <PageTitle>Cinofili</PageTitle>
+      <h1 className="mb-4 font-serif text-4xl leading-tight text-gold italic">Cinofili</h1>
       <p className="text-lg text-muted">Il cineforum tra amici, con la suspense degli Oscar</p>
       <ol className="my-8 space-y-5">
         {STEPS.map(([title, text], i) => (

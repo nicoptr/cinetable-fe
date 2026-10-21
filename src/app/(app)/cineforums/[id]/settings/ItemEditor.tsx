@@ -89,7 +89,7 @@ export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey
                 >
                   Modifica
                 </Button>
-                <ConfirmButton variant="secondary" disabled={busy} onConfirm={() => run(i.id, () => api(`${path}/${i.id}`, { method: "DELETE" }))}>
+                <ConfirmButton variant="danger" disabled={busy} onConfirm={() => run(i.id, () => api(`${path}/${i.id}`, { method: "DELETE" }))}>
                   Elimina
                 </ConfirmButton>
               </div>
@@ -100,7 +100,7 @@ export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey
       <form onSubmit={add}>
         <Field label={nameLabel} value={name} onChange={(e) => setName(e.target.value)} />
         <Field label={extraLabel} textarea value={extra} onChange={(e) => setExtra(e.target.value)} />
-        <Button type="submit" pending={busy} disabled={busy}>
+        <Button type="submit" pending={busy} disabled={busy} className="w-full">
           {addLabel}
         </Button>
         {err(0) && (

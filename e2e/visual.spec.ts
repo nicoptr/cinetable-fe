@@ -4,7 +4,7 @@ import { isoToRomeLocal } from "../src/lib/format";
 
 const SEASON = "/cineforums/1/seasons/1";
 
-type Shot = { name: string; scenario: Scenario; as?: Player; path: string; setup?: (page: Page) => Promise<void> };
+type Shot = { name: string; scenario: Scenario; as?: Player; path: string; setup?: (page: Page) => Promise<void>; instant?: boolean };
 
 async function createDraft(page: Page) {
   await page.goto("/cineforums/1/seasons/new");
@@ -19,8 +19,20 @@ async function openEnvelope(page: Page, name: RegExp) {
   const button = page.getByRole("button", { name });
   await button.click();
   await button.click();
-  await expect.poll(() => page.locator(".env-content").first().evaluate((e) => getComputedStyle(e).opacity), { timeout: 5000 }).toBe("1");
-  await page.waitForTimeout(800);
+  await expect(page.locator(".env-content")).toBeVisible();
+}
+
+async function opened(page: Page, name: RegExp) {
+  await openEnvelope(page, name);
+  const caption = page.locator(".env-content .envelope-caption").last();
+  await expect.poll(() => caption.evaluate((e) => getComputedStyle(e).opacity), { timeout: 5000 }).toBe("1");
+}
+
+/** A metà apertura: lembo aperto, busta che scende, locandina che sale. */
+async function midway(page: Page, name: RegExp) {
+  await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+  await openEnvelope(page, name);
+  await page.waitForTimeout(1000);
 }
 
 /** Locandine lazy caricate e indicatore di sviluppo di Next nascosto, così lo screenshot mostra la pagina vera. */
@@ -39,7 +51,7 @@ const SHOTS: Shot[] = [
   { name: "signup", scenario: "base", path: "/signup" },
   { name: "signup-invite", scenario: "base", path: "/signup?invite=x&email=ospite@e2e.it" },
   { name: "forgot-password", scenario: "base", path: "/forgot-password" },
-  { name: "not-found", scenario: "base", path: "/nope" },
+  { name: "not-found", scenario: "base", as: "anna", path: "/nope" },
   { name: "cineforums", scenario: "base", as: "anna", path: "/cineforums" },
   { name: "menu", scenario: "base", as: "carla", path: "/cineforums", setup: (p) => p.getByRole("button", { name: "Menu" }).click() },
   { name: "cineforum", scenario: "base", as: "anna", path: "/cineforums/1" },
@@ -53,9 +65,11 @@ const SHOTS: Shot[] = [
   { name: "profile", scenario: "base", as: "anna", path: "/profile" },
   { name: "season-open", scenario: "open", as: "anna", path: SEASON },
   { name: "season-screening", scenario: "screening", as: "anna", path: SEASON },
-  { name: "season-screening-opened", scenario: "screening", as: "anna", path: SEASON, setup: (p) => openEnvelope(p, /Film n\. 1/) },
+  { name: "season-screening-opened", scenario: "screening", as: "anna", path: SEASON, setup: (p) => opened(p, /Film n\. 1/) },
+  { name: "season-screening-midway", scenario: "screening", as: "anna", path: SEASON, setup: (p) => midway(p, /Film n\. 1/), instant: true },
   { name: "season-final", scenario: "final", as: "anna", path: SEASON },
-  { name: "season-final-opened", scenario: "final", as: "anna", path: SEASON, setup: (p) => openEnvelope(p, /^Miglior film\./) },
+  { name: "season-final-opened", scenario: "final", as: "anna", path: SEASON, setup: (p) => opened(p, /^Miglior film\./) },
+  { name: "season-final-midway", scenario: "final", as: "anna", path: SEASON, setup: (p) => midway(p, /^Miglior film\./), instant: true },
   { name: "film-vote", scenario: "final", as: "anna", path: `${SEASON}/films/2` },
   { name: "film-own", scenario: "final", as: "anna", path: `${SEASON}/films/1` },
   { name: "season-done", scenario: "done", as: "anna", path: SEASON },
@@ -73,7 +87,7 @@ for (const width of [360, 1280]) {
         if (shot.path) await page.goto(shot.path);
         await shot.setup?.(page);
         await expectNoHorizontalScroll(page);
-        await settle(page);
+        if (!shot.instant) await settle(page);
         await page.screenshot({ path: `e2e/screenshots/${width}/${shot.name}.png`, fullPage: true });
       });
     }

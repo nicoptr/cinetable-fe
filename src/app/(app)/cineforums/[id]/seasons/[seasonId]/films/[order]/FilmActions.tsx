@@ -45,7 +45,7 @@ export function PlanScreening({ base, screeningAt, location }: { base: string; s
       >
         <Field label="Data e ora" name="at" type="datetime-local" defaultValue={screeningAt ? isoToRomeLocal(screeningAt) : ""} required />
         <Field label="Luogo" name="location" defaultValue={location ?? ""} maxLength={200} required />
-        <Button type="submit" pending={busy} pendingLabel="Salvataggio…">
+        <Button type="submit" pending={busy} pendingLabel="Salvataggio…" className="w-full">
           Salva la proiezione
         </Button>
       </form>

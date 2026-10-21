@@ -24,7 +24,8 @@ test("anna apre le due buste; all'ultima la rassegna è conclusa", async ({ page
   seed("final");
   await loginAs(page, "anna");
   await page.goto(SEASON);
-  await expect(page.getByRole("heading", { name: "Serata finale" })).toBeVisible();
+  await expect(page.getByText("Serata finale", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Le buste" })).toBeVisible();
 
   await open(page, "Miglior film");
   const film = page.getByRole("region", { name: "Miglior film" });
@@ -86,7 +87,8 @@ test("bruno vede i risultati solo delle buste aperte", async ({ page }) => {
   await loginAs(page, "bruno");
   await page.goto(SEASON);
   // in SCREENING solo il presidente vede la serata finale
-  await expect(page.getByRole("heading", { name: "Serata finale" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Le buste" })).toHaveCount(0);
+  await expect(page.getByText("Serata finale", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Miglior/ })).toHaveCount(0);
 
   const res = await page.request.post(`/api${SEASON}/awards/1/open`);

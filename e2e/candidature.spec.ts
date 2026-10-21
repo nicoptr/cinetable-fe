@@ -35,7 +35,7 @@ test("bruno cerca e candida un film: vede la locandina e lo stato valido", async
   await mockSearch(page);
   await loginAs(page, "bruno");
   await page.goto(SEASON);
-  await expect(page.getByText("Candidature aperte fino a")).toBeVisible();
+  await expect(page.getByText("Chiusura candidature:")).toBeVisible();
   await expect(page.getByText("La tua categoria")).toBeVisible();
   await expect(page.getByText("Commedia italiana")).toBeVisible();
   await expect(page.getByText("Tienila segreta")).toBeVisible();

@@ -38,7 +38,7 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
   const showSearch = searching || mine?.status === "NONE" || mine?.status === "DUPLICATE";
   return (
     <>
-      <p>Candidature aperte fino a {formatDateTime(season.candidaturesCloseAt)}</p>
+      <p>{passed ? "Candidature chiuse il" : "Chiusura candidature:"} {formatDateTime(season.candidaturesCloseAt)}</p>
       {season.finalNightAt && <p className="text-muted">Serata finale {formatDateTime(season.finalNightAt)}</p>}
       <p className="mb-6 text-muted">
         {valid} film su {expected}
@@ -86,7 +86,7 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
               {progress.missing.map((p) => (
                 <li key={p.userId} className="flex items-center justify-between gap-3 border-b border-line py-1">
                   <span>{p.username}</span>
-                  <ConfirmButton variant="secondary" disabled={busy} onConfirm={() => run(() => api(`${base}/participants/${p.userId}`, { method: "DELETE" }))}>
+                  <ConfirmButton variant="danger" disabled={busy} onConfirm={() => run(() => api(`${base}/participants/${p.userId}`, { method: "DELETE" }))}>
                     Togli dalla rassegna
                   </ConfirmButton>
                 </li>
@@ -101,7 +101,7 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
             }}
           >
             <Field label="Sposta la scadenza" type="datetime-local" value={closeAt} onChange={(e) => setCloseAt(e.target.value)} required />
-            <Button type="submit" disabled={busy}>
+            <Button type="submit" disabled={busy} className="w-full">
               Salva scadenza
             </Button>
           </form>

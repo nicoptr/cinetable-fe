@@ -30,10 +30,12 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
       : s.status === "SCREENING" && s.remainingToReveal > 0;
   const final = s.status === "FINAL" || s.status === "DONE";
   const finalNight = final || (president && s.status === "SCREENING" && s.remainingToReveal === 0 && s.program.length > 0);
+  const label =
+    s.status === "OPEN" && new Date(s.candidaturesCloseAt) <= new Date() ? "Candidature chiuse" : finalNight && s.status === "SCREENING" ? "Serata finale" : STATUS[s.status];
   return (
     <>
       <PageTitle>{s.name}</PageTitle>
-      <p className="eyebrow mb-1">{STATUS[s.status]}</p>
+      <p className="eyebrow mb-1">{label}</p>
       {s.status !== "OPEN" && (
         <p className="mb-6 text-muted">
           Candidature fino al {formatDateTime(s.candidaturesCloseAt)}

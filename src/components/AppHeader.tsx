@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, ApiError } from "@/lib/api";
 import { Notice } from "./ui";
 
-const item = "flex min-h-11 items-center border-t border-line px-1 text-left text-base hover:text-gold disabled:opacity-60";
+const item = "flex min-h-11 items-center border-t border-line text-left text-base hover:text-gold disabled:opacity-60";
 
 export function AppHeader({ pending }: { pending: number }) {
   const [open, setOpen] = useState(false);
@@ -49,7 +49,7 @@ export function AppHeader({ pending }: { pending: number }) {
           aria-expanded={open}
           aria-controls={open ? "app-menu" : undefined}
           onClick={() => (open ? close() : setOpen(true))}
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded px-3 hover:text-gold"
+          className="inline-flex min-h-11 min-w-11 items-center justify-end rounded hover:text-gold"
         >
           <span className="sr-only">Menu</span>
           <span aria-hidden className="text-2xl leading-none">{open ? "✕" : "☰"}</span>
