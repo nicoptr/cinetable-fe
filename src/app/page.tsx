@@ -42,12 +42,12 @@ export default async function Home() {
       </ol>
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
         {loggedIn ? (
-          <Link href="/cineforums" className={`${linkBase} rounded border border-gold px-5 text-gold hover:bg-gold/10`}>
+          <Link href="/cineforums" className={`${linkBase} rounded btn-primary border border-gold px-5 text-gold`}>
             Vai ai tuoi cineforum
           </Link>
         ) : (
           <>
-            <Link href="/signup" className={`${linkBase} rounded border border-gold px-5 text-gold hover:bg-gold/10`}>
+            <Link href="/signup" className={`${linkBase} rounded btn-primary border border-gold px-5 text-gold`}>
               Crea il tuo cineforum
             </Link>
             <Link href="/login" className={`${linkBase} px-1 underline underline-offset-4 hover:text-gold`}>

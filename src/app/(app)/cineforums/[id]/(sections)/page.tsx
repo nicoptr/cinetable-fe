@@ -53,7 +53,7 @@ export default async function SeasonsPage({ params }: { params: Promise<{ id: st
       <Seasons id={id} title="In corso" seasons={seasons.filter((s) => s.status !== "DONE")} />
       <Seasons id={id} title="Concluse" seasons={seasons.filter((s) => s.status === "DONE")} />
       {c.myRole === "PRESIDENT" && (
-        <Link href={`/cineforums/${id}/seasons/new`} className="mt-6 inline-flex min-h-11 items-center justify-center rounded border border-gold px-5 text-gold hover:bg-gold/10">
+        <Link href={`/cineforums/${id}/seasons/new`} className="mt-6 inline-flex min-h-11 items-center justify-center rounded btn-primary border border-gold px-5 text-gold">
           + Nuova edizione
         </Link>
       )}

@@ -7,7 +7,7 @@ import type { InviteInfo } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Invito", robots: { index: false, follow: false }, referrer: "no-referrer" };
 
-const link = "inline-flex min-h-11 items-center justify-center rounded border border-gold px-5 text-gold hover:bg-gold/10";
+const link = "inline-flex min-h-11 items-center justify-center rounded btn-primary border border-gold px-5 text-gold";
 
 function Message({ title, text }: { title: string; text: string }) {
   return (

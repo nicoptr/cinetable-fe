@@ -5,7 +5,7 @@ import { useEffect, useId, useRef, useState, type ButtonHTMLAttributes, type Com
 type Variant = "primary" | "secondary" | "danger";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "border border-gold px-5 text-gold hover:bg-gold/10",
+  primary: "btn-primary border border-gold px-5 text-gold",
   secondary: "text-ink underline underline-offset-4 hover:text-gold",
   danger: "text-error underline underline-offset-4 hover:opacity-80",
 };
@@ -152,7 +152,7 @@ const SIZES = { sm: "w-12", md: "w-20", lg: "w-full" };
 
 /** Locandina 2:3. `movie` null = film non ancora svelato. */
 export function Poster({ movie, size = "md" }: { movie: { title: string; posterUrl: string | null } | null; size?: keyof typeof SIZES }) {
-  const box = `${SIZES[size]} aspect-[2/3] shrink-0 overflow-hidden rounded border border-line bg-surface`;
+  const box = `${SIZES[size]} aspect-[2/3] shrink-0 overflow-hidden rounded border border-line bg-surface shadow-[0_12px_24px_rgb(0_0_0/0.55)] outline-1 -outline-offset-2 outline-white/6 transition-transform duration-250 hover:-translate-y-[3px] hover:-rotate-[0.6deg]`;
   if (!movie) {
     return (
       <div className={`${box} flex items-center justify-center font-serif text-2xl text-gold`} role="img" aria-label="Film da svelare">
