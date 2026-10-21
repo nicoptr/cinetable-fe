@@ -40,7 +40,7 @@ export function AppHeader({ pending }: { pending: number }) {
   return (
     <header className="-mt-6 mb-6 border-b border-line print:hidden" onKeyDown={(e) => e.key === "Escape" && open && close()}>
       <div className="flex items-center justify-between">
-        <Link href="/cineforums" className="inline-flex min-h-11 items-center font-serif text-2xl text-gold">
+        <Link href="/cineforums" className="inline-flex min-h-11 items-center font-serif text-2xl italic text-gold">
           Cinofili
         </Link>
         <button

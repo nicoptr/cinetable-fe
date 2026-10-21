@@ -6,8 +6,8 @@ type Variant = "primary" | "secondary" | "danger";
 
 const VARIANTS: Record<Variant, string> = {
   primary: "border border-gold px-5 text-gold hover:bg-gold/10",
-  secondary: "px-1 text-ink underline underline-offset-4 hover:text-gold",
-  danger: "border border-error px-5 text-error hover:bg-error/10",
+  secondary: "text-ink underline underline-offset-4 hover:text-gold",
+  danger: "text-error underline underline-offset-4 hover:opacity-80",
 };
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {

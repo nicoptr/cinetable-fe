@@ -40,9 +40,10 @@ export function Draft({ cineforumId, season, members, categories, awards }: { ci
       <Summary title="Partecipanti" items={season.participants.map((p) => p.username)} />
       {error && <Notice tone="error">{error}</Notice>}
       {season.myRole === "PRESIDENT" ? (
-        <div className="mt-6 flex flex-col items-stretch gap-3">
+        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
           <ConfirmButton
             disabled={busy}
+            className="w-full"
             confirmLabel="Tocca di nuovo: partono le email con le categorie segrete"
             onConfirm={() => run(async () => {
               await api(`${base}/launch`, { method: "POST" });

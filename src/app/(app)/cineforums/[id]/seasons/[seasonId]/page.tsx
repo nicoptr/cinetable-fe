@@ -33,7 +33,7 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
   return (
     <>
       <PageTitle>{s.name}</PageTitle>
-      <p className="mb-1">{STATUS[s.status]}</p>
+      <p className="eyebrow mb-1">{STATUS[s.status]}</p>
       {s.status !== "OPEN" && (
         <p className="mb-6 text-muted">
           Candidature fino al {formatDateTime(s.candidaturesCloseAt)}

@@ -53,7 +53,7 @@ export default async function CineforumPage({ params }: { params: Promise<{ id: 
         ))}
       </ul>
       {president && (
-        <Link href={`/cineforums/${id}/seasons/new`} className={`${LINK} mt-4`}>
+        <Link href={`/cineforums/${id}/seasons/new`} className="mt-6 inline-flex min-h-11 items-center justify-center rounded border border-gold px-5 text-gold hover:bg-gold/10">
           Nuova rassegna
         </Link>
       )}

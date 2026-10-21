@@ -47,15 +47,15 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
       {season.isParticipant && mine && (
         <>
           {season.myCategory && (
-            <section className="mb-6 border border-gold p-4">
-              <h2 className="text-sm text-muted">La tua categoria</h2>
+            <section className="mb-8 border-l-2 border-gold py-1 pl-4">
+              <h2 className="eyebrow">La tua categoria</h2>
               <p className="font-serif text-2xl text-gold">{season.myCategory.name}</p>
               <p className="text-sm text-muted">Tienila segreta</p>
             </section>
           )}
           <section className="mb-6">
             <h2 className="mb-2 font-serif text-xl">Il tuo film</h2>
-            {mine.status === "NONE" && <p className="text-muted">Non hai ancora scelto: cerca il tuo film qui sotto.</p>}
+            {mine.status === "NONE" && <p className="mb-4 text-muted">Non hai ancora scelto: cerca il tuo film qui sotto.</p>}
             {mine.status === "DUPLICATE" && <Notice tone="error">Anche un altro partecipante ha scelto questo film: scegline un altro</Notice>}
             {mine.movie && (
               <div className="mb-3 flex items-start gap-3">
