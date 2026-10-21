@@ -6,7 +6,7 @@ import { test as base, expect, type Page } from "@playwright/test";
 export { expect };
 
 /**
- * `test` di tutti gli spec: ogni test manda un `X-Forwarded-For` suo (il backend e2e ha TRUST_PROXY=true),
+ * `test` di tutti gli spec: ogni test manda un `X-Forwarded-For` suo (il backend e2e ha TRUST_PROXY=1 e Next lo inoltra così com'è),
  * così i rate limit per IP del backend (es. 10 login/min) non si sommano tra un test e l'altro.
  */
 export const test = base.extend({

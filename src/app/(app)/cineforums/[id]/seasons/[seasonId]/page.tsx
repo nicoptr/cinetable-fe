@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageTitle } from "@/components/ui";
 import { apiServer } from "@/lib/api-server";
-import { formatDateTime } from "@/lib/format";
+import { candidaturesClosed, formatDateTime } from "@/lib/format";
 import type { Award, Category, CandidatureProgress, CineforumDetail, MyCandidature, SeasonResults, SeasonView } from "@/lib/types";
 import { Draft } from "./_draft";
 import { FinalNight } from "./_final";
@@ -30,6 +30,12 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
       : s.status === "SCREENING" && s.remainingToReveal > 0;
   const final = s.status === "FINAL" || s.status === "DONE";
   const finalNight = final || (president && s.status === "SCREENING" && s.remainingToReveal === 0 && s.program.length > 0);
+  const [results, mine, progress, editor] = await Promise.all([
+    final ? apiServer<SeasonResults>(`${base}/results`) : null,
+    s.status === "OPEN" && s.isParticipant ? apiServer<MyCandidature>(`${base}/candidature`) : null,
+    s.status === "OPEN" && president ? apiServer<CandidatureProgress>(`${base}/progress`) : null,
+    s.status === "DRAFT" && president ? editorData(id) : null,
+  ]);
   const label =
     s.status === "OPEN" && new Date(s.candidaturesCloseAt) <= new Date() ? "Candidature chiuse" : finalNight && s.status === "SCREENING" ? "Serata finale" : STATUS[s.status];
   return (
@@ -38,7 +44,7 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
       <p className="eyebrow mb-1">{label}</p>
       {s.status !== "OPEN" && (
         <p className="mb-6 text-muted">
-          Candidature fino al {formatDateTime(s.candidaturesCloseAt)}
+          {candidaturesClosed(s.status, s.candidaturesCloseAt) ? "Candidature chiuse il" : "Candidature fino al"} {formatDateTime(s.candidaturesCloseAt)}
           {s.finalNightAt && ` · serata finale ${formatDateTime(s.finalNightAt)}`}
         </p>
       )}
@@ -57,7 +63,7 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
           base={base}
           awards={s.awards}
           president={president}
-          results={final ? await apiServer<SeasonResults>(`${base}/results`) : null}
+          results={results}
         />
       )}
       {s.status === "DRAFT" ? (
@@ -65,14 +71,14 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
           cineforumId={id}
           season={s}
           // le liste servono solo al form di modifica del presidente
-          {...(president && (await editorData(id)))}
+          {...editor}
         />
       ) : s.status === "OPEN" ? (
         <Open
           cineforumId={id}
           season={s}
-          mine={s.isParticipant ? await apiServer<MyCandidature>(`/cineforums/${id}/seasons/${seasonId}/candidature`) : null}
-          progress={president ? await apiServer<CandidatureProgress>(`/cineforums/${id}/seasons/${seasonId}/progress`) : null}
+          mine={mine}
+          progress={progress}
         />
       ) : (
         <Screening base={base} season={s} />

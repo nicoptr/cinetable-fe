@@ -89,7 +89,12 @@ export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey
                 >
                   Modifica
                 </Button>
-                <ConfirmButton variant="danger" disabled={busy} onConfirm={() => run(i.id, () => api(`${path}/${i.id}`, { method: "DELETE" }))}>
+                <ConfirmButton
+                  variant="danger"
+                  disabled={busy}
+                  aria-label={`Elimina ${i.name}`}
+                  armedAriaLabel={`Tocca di nuovo per confermare l'eliminazione di ${i.name}`}
+                  onConfirm={() => run(i.id, () => api(`${path}/${i.id}`, { method: "DELETE" }))}>
                   Elimina
                 </ConfirmButton>
               </div>

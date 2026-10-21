@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { PageTitle } from "@/components/ui";
 import { BACKEND } from "@/lib/api-server";
@@ -26,7 +27,12 @@ export default async function InvitePage({ searchParams }: { searchParams: Promi
   // pubblica: niente apiServer (404 per un token sbagliato è un caso normale)
   let res: Response;
   try {
-    res = await fetch(`${BACKEND}/sub/api/invitations/token/${encodeURIComponent(token)}`, { cache: "no-store" });
+    // l'IP del client, così il rate limit per IP del backend non mette tutti nello stesso secchio
+    const forwardedFor = (await headers()).get("x-forwarded-for");
+    res = await fetch(`${BACKEND}/sub/api/invitations/token/${encodeURIComponent(token)}`, {
+      cache: "no-store",
+      headers: forwardedFor ? { "x-forwarded-for": forwardedFor } : undefined,
+    });
   } catch {
     return <Message title="Servizio non disponibile, riprova tra poco" text="Non siamo riusciti a controllare l'invito." />;
   }

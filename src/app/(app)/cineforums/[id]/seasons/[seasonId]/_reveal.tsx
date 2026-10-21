@@ -20,9 +20,9 @@ export function RevealNext({ base, next, available }: { base: string; next: numb
     <Envelope
       label={`Film n. ${next}`}
       onOpen={async () => {
-        const item = await api<ProgramItem>(`${base}/reveal-next`, { method: "POST" });
+        // anche dopo un errore: il server può aver già cambiato stato (es. svelato da un'altra scheda)
+        const item = await api<ProgramItem>(`${base}/reveal-next`, { method: "POST" }).finally(() => router.refresh());
         setOpened(true);
-        router.refresh();
         return <Revealed item={item} />;
       }}
     />

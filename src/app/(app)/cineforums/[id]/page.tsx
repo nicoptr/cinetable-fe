@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageTitle } from "@/components/ui";
 import { apiServer } from "@/lib/api-server";
-import { formatDate } from "@/lib/format";
+import { candidaturesClosed, formatDate } from "@/lib/format";
 import type { CineforumDetail, SeasonListItem } from "@/lib/types";
 
 const STATUS: Record<SeasonListItem["status"], string> = {
@@ -12,6 +12,12 @@ const STATUS: Record<SeasonListItem["status"], string> = {
   FINAL: "Serata finale",
   DONE: "Conclusa",
 };
+
+function closeText(s: SeasonListItem) {
+  const date = formatDate(s.candidaturesCloseAt);
+  if (!candidaturesClosed(s.status, s.candidaturesCloseAt)) return `${STATUS[s.status]} · candidature fino al ${date}`;
+  return s.status === "OPEN" ? `Candidature chiuse il ${date}` : `${STATUS[s.status]} · candidature chiuse il ${date}`;
+}
 
 const LINK = "inline-flex min-h-11 items-center text-gold underline underline-offset-4";
 
@@ -45,7 +51,7 @@ export default async function CineforumPage({ params }: { params: Promise<{ id: 
             <Link href={`/cineforums/${id}/seasons/${s.id}${s.status === "DONE" ? "/summary" : ""}`} className="block py-3">
               <span className="font-serif text-xl">{s.name}</span>
               <span className="block text-muted">
-                {STATUS[s.status]} · candidature fino al {formatDate(s.candidaturesCloseAt)}
+                {closeText(s)}
                 {s.finalNightAt && ` · serata finale ${formatDate(s.finalNightAt)}`}
               </span>
             </Link>

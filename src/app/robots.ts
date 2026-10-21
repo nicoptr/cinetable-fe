@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
+import { SITE } from "@/lib/site";
 
+// Le pagine non indicizzabili hanno già `noindex`: devono poter essere scansionate perché il crawler lo veda.
 export default function robots(): MetadataRoute.Robots {
-  return { rules: { userAgent: "*", allow: "/", disallow: ["/login", "/signup", "/verify-email", "/forgot-password", "/reset-password", "/invite", "/cineforums", "/invitations", "/profile", "/api"] }, sitemap: `${SITE}/sitemap.xml` };
+  return { rules: { userAgent: "*", allow: "/" }, sitemap: `${SITE}/sitemap.xml` };
 }
-
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";

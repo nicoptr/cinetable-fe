@@ -49,6 +49,7 @@ export function FinalNight({
                   result = await api<AwardResult>(`${base}/awards/${a.id}/open`, { method: "POST" });
                 } catch (err) {
                   setOpening(null);
+                  router.refresh();
                   throw err;
                 }
                 setTimeout(() => setOpening(null), ENVELOPE_ANIMATION_MS);

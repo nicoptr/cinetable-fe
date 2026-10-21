@@ -36,6 +36,8 @@ const CONFIRM_MS = 4000;
 type ConfirmButtonProps = Omit<ButtonProps, "onClick" | "pending"> & {
   onConfirm: () => unknown;
   confirmLabel?: string;
+  /** nome accessibile da armato (quello da fermo è `aria-label`) */
+  armedAriaLabel?: string;
 };
 
 /**
@@ -73,10 +75,10 @@ export function useConfirm(onConfirm: () => unknown) {
 }
 
 /** Primo tocco: chiede conferma per 4 s. Secondo tocco: esegue `onConfirm` e resta in attesa finché non finisce. */
-export function ConfirmButton({ onConfirm, confirmLabel = "Tocca di nuovo per confermare", children, ...rest }: ConfirmButtonProps) {
+export function ConfirmButton({ onConfirm, confirmLabel = "Tocca di nuovo per confermare", armedAriaLabel, "aria-label": ariaLabel, children, ...rest }: ConfirmButtonProps) {
   const { armed, pending, click } = useConfirm(onConfirm);
   return (
-    <Button {...rest} pending={pending} onClick={click} aria-live="polite">
+    <Button {...rest} pending={pending} onClick={click} aria-live="polite" aria-label={armed ? armedAriaLabel : ariaLabel}>
       {armed ? confirmLabel : children}
     </Button>
   );

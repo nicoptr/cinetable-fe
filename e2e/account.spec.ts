@@ -117,7 +117,7 @@ test("la home ha i metadata SEO e le altre pagine sono noindex", async ({ page, 
 
   const robots = await (await request.get("/robots.txt")).text();
   expect(robots).toContain("Allow: /");
-  expect(robots).toContain("Disallow: /login");
+  expect(robots).not.toContain("Disallow"); // le pagine non indicizzabili si scansionano e hanno noindex
   const sitemap = await (await request.get("/sitemap.xml")).text();
   expect(sitemap.match(/<loc>/g)).toHaveLength(1);
 });

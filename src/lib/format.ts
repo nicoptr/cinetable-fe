@@ -55,3 +55,6 @@ export function isoToRomeLocal(iso: string) {
   const p = romeFields(new Date(iso).getTime());
   return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
 }
+
+/** Fase candidature finita: stato oltre OPEN oppure data di chiusura passata. */
+export const candidaturesClosed = (status: string, closeAt: string) => !["DRAFT", "OPEN"].includes(status) || new Date(closeAt) <= new Date();

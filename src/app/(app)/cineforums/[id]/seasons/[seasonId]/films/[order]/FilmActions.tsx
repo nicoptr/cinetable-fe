@@ -21,7 +21,10 @@ function useAction() {
       router.refresh();
       return true;
     } catch (err) {
-      setError((err as ApiError).message);
+      const { status, message } = err as ApiError;
+      setError(message);
+      // 4xx (es. 409 voto già inviato o voto chiuso): il form è vecchio, la vista del server no
+      if (status >= 400 && status < 500 && status !== 429) router.refresh();
       return false;
     } finally {
       setBusy(false);
