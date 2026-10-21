@@ -34,4 +34,6 @@ test("login, poi /login con la sessione porta a next (solo interno)", async ({ p
   await expect(page).toHaveURL(/\/profile$/);
   await page.goto("/login?next=%2F%09%2Fevil.com");
   await expect(page).toHaveURL(/localhost:3056\/cineforums$/);
+  await page.goto("/login?next=%2F.%2F%2Fevil.com");
+  await expect(page).toHaveURL(/localhost:3056\/cineforums$/);
 });
