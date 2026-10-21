@@ -669,6 +669,293 @@ button.env[data-pending] .env-seal {
   }
 }
 
+/* Landing (app/page.tsx, app/_landing.tsx), dal mock 12-landing */
+.btn-solid {
+  border-color: transparent;
+  background: linear-gradient(180deg, #d8b25a, #b48d3a);
+  color: var(--color-bg);
+  font-weight: 600;
+  box-shadow:
+    0 8px 22px rgb(201 162 74 / 0.25),
+    0 4px 14px rgb(0 0 0 / 0.4);
+}
+.btn-solid:hover {
+  background: linear-gradient(180deg, #e2bd65, #be9640);
+}
+
+/* sipario d'apertura: si apre da solo all'arrivo, senza JS (il contenuto è già nel DOM) */
+.curtain-intro .curtain-panel {
+  animation: curtain-intro 900ms cubic-bezier(0.65, 0, 0.35, 1) 350ms backwards;
+}
+.curtain-intro .curtain-valance {
+  animation: curtain-intro 600ms ease 1.1s backwards;
+}
+@keyframes curtain-intro {
+  from {
+    transform: none;
+  }
+}
+
+/* il palco dell'hero: decorativo */
+.stage {
+  position: relative;
+  height: 230px;
+  margin: 0 -16px 28px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-line);
+  background: radial-gradient(60% 80% at 50% 100%, rgb(201 162 74 / 0.16), transparent 70%);
+}
+.stage-valance {
+  position: absolute;
+  z-index: 3;
+  inset: 0 0 auto;
+  height: 30px;
+  background: linear-gradient(180deg, #5c1219, #3c0a0f);
+  border-bottom: 3px solid var(--color-gold);
+  box-shadow: 0 6px 14px rgb(0 0 0 / 0.6);
+}
+.stage-side {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  width: 22%;
+  background: repeating-linear-gradient(90deg, #4a0f14 0 10px, #6e1820 16px, #8a2028 22px, #6e1820 28px, #4a0f14 38px);
+}
+.stage-left {
+  left: 0;
+  border-radius: 0 0 60% 0;
+  box-shadow: 8px 0 18px rgb(0 0 0 / 0.5);
+}
+.stage-right {
+  right: 0;
+  border-radius: 0 0 0 60%;
+  box-shadow: -8px 0 18px rgb(0 0 0 / 0.5);
+}
+.fan {
+  position: absolute;
+  left: 50%;
+  bottom: -26px;
+  translate: -50% 0;
+  width: 300px;
+  height: 200px;
+}
+.fan-poster {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 92px;
+  aspect-ratio: 2 / 3;
+  margin-left: -46px;
+  display: grid;
+  place-items: center;
+  transform-origin: 50% 120%;
+  border: 1px solid rgb(201 162 74 / 0.25);
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 35%, #2c2526, #161213);
+  box-shadow: 0 14px 26px rgb(0 0 0 / 0.6);
+  font: 34px var(--font-serif);
+  color: var(--color-gold);
+}
+.mini-env {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 70px;
+  translate: -50% 0;
+  width: 150px;
+  aspect-ratio: 16 / 10;
+  border-radius: 8px;
+  background: linear-gradient(160deg, #efe6d6, #d8cbb3);
+  box-shadow: 0 18px 30px rgb(0 0 0 / 0.6);
+  animation: mini-env-float 4s ease-in-out infinite;
+}
+.mini-env::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 100% 0, 50% 58%);
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #e2d6c0, #c9b99c);
+}
+@keyframes mini-env-float {
+  50% {
+    translate: -50% -6px;
+  }
+}
+.wax {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e6c46e, #9c7a2c 70%);
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.45);
+}
+.wax svg {
+  width: 66%;
+  height: 66%;
+}
+
+/* come si gioca: i passi lungo un filo d'oro */
+.steps {
+  position: relative;
+}
+.steps::before {
+  content: "";
+  position: absolute;
+  left: 21px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--color-gold), rgb(201 162 74 / 0.1));
+}
+.step-num {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--color-gold);
+  border-radius: 50%;
+  background: var(--color-bg);
+  box-shadow: 0 0 0 6px var(--color-bg);
+  font: 20px var(--font-serif);
+  color: var(--color-gold);
+}
+
+/* provala: la busta finta */
+.demo-env {
+  position: relative;
+  width: min(300px, 82%);
+  aspect-ratio: 16 / 10;
+  margin: 10px auto 20px;
+  perspective: 800px;
+  transition: margin 0.8s 0.8s;
+}
+.demo-env[data-open] {
+  margin-bottom: 140px;
+}
+.demo-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: linear-gradient(160deg, #efe6d6, #d8cbb3);
+  box-shadow: 0 24px 40px rgb(0 0 0 / 0.6);
+  transition:
+    translate 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s,
+    opacity 0.5s 0.9s;
+}
+.demo-flap {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  clip-path: polygon(0 0, 100% 0, 50% 58%);
+  transform-origin: 50% 0;
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(180deg, #e2d6c0, #c9b99c);
+  transition:
+    transform 0.7s ease 0.2s,
+    opacity 0.3s ease 0.75s;
+}
+.demo-env .wax {
+  z-index: 3;
+  width: 54px;
+  height: 54px;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 0.45);
+  transition:
+    scale 0.3s,
+    opacity 0.3s;
+}
+.demo-winner {
+  position: absolute;
+  z-index: 4;
+  inset: -10px 8% auto;
+  visibility: hidden;
+  opacity: 0;
+  translate: 0 30px;
+  pointer-events: none;
+  transition:
+    opacity 0.6s,
+    translate 1s cubic-bezier(0.2, 0.8, 0.2, 1),
+    visibility 0s 0.6s;
+}
+.demo-env[data-open] .wax {
+  scale: 1.4;
+  opacity: 0;
+}
+.demo-env[data-open] .demo-flap {
+  transform: rotateX(180deg);
+  opacity: 0;
+}
+.demo-env[data-open] .demo-body {
+  translate: 0 60px;
+  opacity: 0;
+}
+.demo-env[data-open] .demo-winner {
+  visibility: visible;
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 0.6s 1s,
+    translate 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s,
+    visibility 0s;
+}
+
+.faq details {
+  border-top: 1px solid var(--color-line);
+}
+.faq details:last-child {
+  border-bottom: 1px solid var(--color-line);
+}
+.faq summary {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  list-style: none;
+  font: 19px var(--font-serif);
+}
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+.faq summary::after {
+  content: "+";
+  color: var(--color-gold);
+  font-size: 22px;
+  transition: rotate 0.2s;
+}
+.faq details[open] summary::after {
+  rotate: 45deg;
+}
+
+/* comparsa allo scroll (RiseOnScroll); senza JS resta tutto visibile (noscript in page.tsx) */
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    transition:
+      opacity 0.6s,
+      translate 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .rise:not(.in) {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-env {
+    animation: none;
+  }
+  .demo-env,
+  .demo-env * {
+    transition-delay: 0s !important;
+  }
+}
+
 /* Stampa, su ogni pagina (pensata per la scheda dell'edizione): fondo bianco, testo nero, niente menu */
 @media print {
   :root {

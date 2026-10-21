@@ -103,9 +103,9 @@ test("sessione revocata → redirect ad accedi con next", async ({ page, context
 test("la home ha i metadata SEO e le altre pagine sono noindex", async ({ page, request }) => {
   seed("base");
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1, name: "Cinetable" })).toBeVisible();
-  await expect(page.getByText("Il cineforum tra amici, con la suspense degli Oscar")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Crea il tuo cineforum" })).toHaveAttribute("href", "/signup");
+  await expect(page.getByRole("heading", { level: 1, name: /Ognuno porta un film\.\s*Nessuno sa di chi è\./ })).toBeVisible();
+  await expect(page).toHaveTitle("Cinetable");
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /Nella serata finale si aprono le buste/);
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /Cinetable/);
   await expect(page.locator('meta[property="og:image"]')).toHaveCount(1);
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
@@ -126,7 +126,7 @@ test("con la sessione la home offre 'Vai ai tuoi cineforum'", async ({ page }) =
   seed("base");
   await loginAs(page, "anna");
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Vai ai tuoi cineforum" })).toHaveAttribute("href", "/cineforums");
-  await page.getByRole("link", { name: "Vai ai tuoi cineforum" }).click();
+  await expect(page.getByRole("link", { name: "Vai ai tuoi cineforum" }).first()).toHaveAttribute("href", "/cineforums");
+  await page.getByRole("link", { name: "Vai ai tuoi cineforum" }).first().click();
   await expect(page.getByRole("heading", { name: "I miei cineforum" })).toBeVisible();
 });

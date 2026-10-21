@@ -4,7 +4,7 @@ test("la home si apre su telefono senza scorrimento orizzontale", async ({ page 
   await seed("base");
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(page.getByText("This product uses the TMDB API")).toBeVisible();
+  await expect(page.getByText("This product uses the TMDB API").filter({ visible: true })).toBeVisible();
   await expectNoHorizontalScroll(page);
 });
 
