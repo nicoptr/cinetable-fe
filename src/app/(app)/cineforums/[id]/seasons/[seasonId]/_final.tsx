@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AwardWinners } from "@/components/AwardWinners";
-import { Envelope } from "@/components/Envelope";
+import { Envelope, ENVELOPE_ANIMATION_MS } from "@/components/Envelope";
 import { Poster } from "@/components/ui";
 import { api } from "@/lib/api";
 import type { AwardResult, SeasonResults, SeasonView } from "@/lib/types";
@@ -12,6 +12,7 @@ import type { AwardResult, SeasonResults, SeasonView } from "@/lib/types";
  * Serata finale: le buste dei premi (solo presidente) e i risultati già aperti.
  * Sta nello stesso punto dell'albero in SCREENING, FINAL e DONE: dopo `router.refresh()`
  * la busta appena aperta resta montata e aperta, e non si ripete tra i risultati.
+ * Una busta alla volta: mentre una si apre (risposta e animazione) le altre sono disabilitate.
  */
 export function FinalNight({
   base,
@@ -26,6 +27,7 @@ export function FinalNight({
 }) {
   const router = useRouter();
   const [justOpened, setJustOpened] = useState<number[]>([]);
+  const [opening, setOpening] = useState<number | null>(null);
   const openedBefore = new Set((results?.awards ?? []).map((a) => a.awardId));
   const envelopes = president ? awards.filter((a) => !openedBefore.has(a.id) || justOpened.includes(a.id)) : [];
   const shown = (results?.awards ?? []).filter((a) => !justOpened.includes(a.awardId));
@@ -39,11 +41,25 @@ export function FinalNight({
             <Envelope
               key={a.id}
               label={a.name}
+              disabled={opening !== null && opening !== a.id}
               onOpen={async () => {
-                const result = await api<AwardResult>(`${base}/awards/${a.id}/open`, { method: "POST" });
+                setOpening(a.id);
+                let result: AwardResult;
+                try {
+                  result = await api<AwardResult>(`${base}/awards/${a.id}/open`, { method: "POST" });
+                } catch (err) {
+                  setOpening(null);
+                  throw err;
+                }
+                setTimeout(() => setOpening(null), ENVELOPE_ANIMATION_MS);
                 setJustOpened((ids) => [...ids, a.id]);
                 router.refresh();
-                return <AwardWinners award={result} envelope />;
+                return (
+                  <>
+                    <h3 className="mb-4 font-serif text-xl text-gold">{result.name}</h3>
+                    <AwardWinners award={result} envelope />
+                  </>
+                );
               }}
             />
           ))}

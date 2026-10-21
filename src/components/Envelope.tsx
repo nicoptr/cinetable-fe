@@ -13,7 +13,10 @@ const SPARKS = Array.from({ length: 12 }, (_, i) => ({ "--a": `${i * 30 + (i % 2
  * Il contenuto può marcare la locandina con `envelope-poster` (alone e riflesso) e la didascalia
  * con `envelope-caption` (appare per ultima).
  */
-export function Envelope({ label, onOpen }: { label: string; onOpen: () => Promise<ReactNode> }) {
+/** Dalla risposta del server alla fine dell'animazione (globals.css, `.env-*`). */
+export const ENVELOPE_ANIMATION_MS = 2500;
+
+export function Envelope({ label, onOpen, disabled = false }: { label: string; onOpen: () => Promise<ReactNode>; disabled?: boolean }) {
   // l'etichetta resta quella della busta aperta anche se il genitore passa già la prossima
   const [opened, setOpened] = useState<{ label: string; content: ReactNode } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +70,7 @@ export function Envelope({ label, onOpen }: { label: string; onOpen: () => Promi
             type="button"
             className="env"
             onClick={click}
-            disabled={pending}
+            disabled={pending || disabled}
             aria-busy={pending || undefined}
             aria-label={`${label}. ${hint}`}
             data-armed={armed || undefined}

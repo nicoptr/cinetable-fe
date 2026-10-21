@@ -46,6 +46,28 @@ test("anna apre le due buste; all'ultima la rassegna è conclusa", async ({ page
   await expectNoHorizontalScroll(page);
 });
 
+test("una busta alla volta: mentre una si apre l'altra è disabilitata", async ({ page }) => {
+  seed("final");
+  await loginAs(page, "anna");
+  await page.goto(SEASON);
+  let release!: () => void;
+  const held = new Promise<void>((r) => (release = r));
+  await page.route("**/awards/*/open", async (route) => {
+    await held;
+    await route.continue();
+  });
+  await open(page, "Miglior film");
+  await expect(envelope(page, "Miglior film")).toBeDisabled();
+  await expect(envelope(page, "Miglior regia")).toBeDisabled();
+  release();
+  const film = page.getByRole("region", { name: "Miglior film" });
+  await expect(film.getByRole("heading", { level: 3, name: "Miglior film" })).toBeVisible();
+  await expect(film.getByRole("heading", { level: 4, name: "Fight Club" })).toBeVisible();
+  // anche durante l'animazione
+  await expect(envelope(page, "Miglior regia")).toBeDisabled();
+  await expect(envelope(page, "Miglior regia")).toBeEnabled({ timeout: 5000 });
+});
+
 test("prima di aprire il voto su tutti i film la busta mostra l'errore e resta chiusa", async ({ page }) => {
   seed("final");
   await loginAs(page, "anna");
@@ -55,7 +77,8 @@ test("prima di aprire il voto su tutti i film la busta mostra l'errore e resta c
   );
   await open(page, "Miglior film");
   await expect(page.getByRole("alert").filter({ hasText: "Apri il voto su tutti i film prima della serata finale" })).toBeVisible();
-  await expect(envelope(page, "Miglior film")).toBeVisible();
+  await expect(envelope(page, "Miglior film")).toBeEnabled();
+  await expect(envelope(page, "Miglior regia")).toBeEnabled();
 });
 
 test("bruno vede i risultati solo delle buste aperte", async ({ page }) => {

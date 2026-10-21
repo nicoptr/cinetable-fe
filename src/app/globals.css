@@ -283,8 +283,9 @@ button.env[data-pending] .env-seal {
 .env-stage[data-open] .envelope-caption {
   animation: env-caption 600ms ease-out 1900ms both;
 }
-/* titolo e resto arrivano quando la locandina è fuori dalla busta */
-.env-stage[data-open] .env-content > :not(.envelope-poster, .envelope-caption) {
+/* titolo e resto arrivano quando la locandina è fuori dalla busta; `envelope-group` raggruppa più locandine (ex aequo) */
+.env-stage[data-open] .env-content > :not(.envelope-poster, .envelope-caption, .envelope-group),
+.env-stage[data-open] .envelope-title {
   animation: env-caption 500ms ease-out 1450ms both;
 }
 
@@ -430,6 +431,7 @@ button.env[data-pending] .env-seal {
   .env-stage[data-open] .env *,
   .env-stage[data-open] .envelope-caption,
   .env-stage[data-open] .env-content > *,
+  .env-stage[data-open] .envelope-title,
   .env-stage[data-open] .envelope-poster::after,
   .env-stage[data-open] .env-glow {
     animation: none !important;
@@ -440,7 +442,7 @@ button.env[data-pending] .env-seal {
   }
 }
 
-/* Stampa (pensata per la scheda della rassegna): fondo bianco, testo nero, niente menu */
+/* Stampa, su ogni pagina (pensata per la scheda della rassegna): fondo bianco, testo nero, niente menu */
 @media print {
   :root {
     --color-bg: #fff;
