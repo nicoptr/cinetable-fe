@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PageTitle } from "@/components/ui";
-import { BACKEND } from "@/lib/api-server";
+import { BACKEND, originHeaders } from "@/lib/api-server";
 import { safeNext } from "@/lib/nav";
 import { LoginForm } from "./LoginForm";
 
@@ -13,7 +13,7 @@ async function hasSession(): Promise<boolean> {
   const jar = await cookies();
   if (!jar.has("cinofili_token")) return false;
   try {
-    const res = await fetch(`${BACKEND}/sub/api/auth/me`, { headers: { cookie: jar.toString() }, cache: "no-store" });
+    const res = await fetch(`${BACKEND}/sub/api/auth/me`, { headers: { cookie: jar.toString(), ...originHeaders() }, cache: "no-store" });
     return res.ok;
   } catch {
     return false;
