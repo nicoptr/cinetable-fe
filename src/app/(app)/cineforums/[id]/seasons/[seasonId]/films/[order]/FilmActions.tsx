@@ -86,7 +86,9 @@ export function VoteForm({ base, awards }: { base: string; awards: SeasonView["a
   const { error, run } = useAction();
   // inviati: niente secondo POST mentre router.refresh() porta la vista in sola lettura
   const [sent, setSent] = useState(false);
-  const [values, setValues] = useState<Record<number, number>>(() => Object.fromEntries(awards.map((a) => [a.id, 50])));
+  // solo i cursori toccati (primo evento `input`, anche da tastiera)
+  const [values, setValues] = useState<Record<number, number>>({});
+  const allTouched = awards.every((a) => values[a.id] !== undefined);
   return (
     <section>
       <h2 className="mb-3 font-serif text-xl">Il tuo voto</h2>
@@ -103,22 +105,24 @@ export function VoteForm({ base, awards }: { base: string; awards: SeasonView["a
               type="range"
               min={0}
               max={100}
-              value={values[a.id]}
+              value={values[a.id] ?? 50}
+              aria-valuetext={values[a.id] === undefined ? "Non ancora votato" : undefined}
               disabled={sent}
               onChange={(e) => setValues({ ...values, [a.id]: Number(e.target.value) })}
-              className="h-11 flex-1 accent-gold"
+              className={`h-11 flex-1 accent-gold ${values[a.id] === undefined ? "opacity-40" : ""}`}
             />
             <output htmlFor={`award-${a.id}`} className="w-10 text-right font-serif text-2xl text-gold tabular-nums">
-              {values[a.id]}
+              {values[a.id] ?? "–"}
             </output>
           </div>
         </div>
       ))}
       <p className="mb-3 text-sm text-muted">I voti non si possono modificare</p>
+      {!allTouched && <p className="mb-3 text-sm text-gold">Muovi tutti i cursori per votare</p>}
       <ConfirmButton
-        disabled={sent}
+        disabled={sent || !allTouched}
         onConfirm={async () => {
-          const ok = await run(() => api(`${base}/votes`, { method: "POST", body: { votes: awards.map((a) => ({ awardId: a.id, value: values[a.id] })) } }));
+          const ok = await run(() => api(`${base}/votes`, { method: "POST", body: { votes: Object.entries(values).map(([id, value]) => ({ awardId: Number(id), value })) } }));
           if (ok) setSent(true);
         }}
       >

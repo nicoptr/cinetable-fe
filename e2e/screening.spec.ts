@@ -97,13 +97,26 @@ test("programmo la proiezione e apro il voto; bruno vota con gli slider", async 
 
   const film = page.getByRole("slider", { name: /Miglior film/ });
   await expect(film).toHaveAccessibleName(/Quanto ti è piaciuto\?/);
+  const send = page.getByRole("button", { name: "Invia i voti" });
+  await expect(send).toBeDisabled();
+  await expect(page.getByText("Muovi tutti i cursori per votare")).toBeVisible();
+  await expect(page.locator("output")).toHaveText(["–", "–"]);
   await film.fill("80");
   await film.press("ArrowRight");
   await expect(page.getByRole("status").filter({ hasText: "81" })).toBeVisible();
+  await expect(send).toBeDisabled(); // manca ancora la regia
   await page.getByRole("slider", { name: /Miglior regia/ }).fill("40");
+  await expect(page.getByText("Muovi tutti i cursori per votare")).toHaveCount(0);
   await expect(page.getByText("I voti non si possono modificare")).toBeVisible();
-  await page.getByRole("button", { name: "Invia i voti" }).click();
+  await expect(send).toBeEnabled();
+  await send.click();
+  const posted = page.waitForRequest((r) => r.method() === "POST" && r.url().endsWith("/program/1/votes"));
   await page.getByRole("button", { name: "Tocca di nuovo per confermare" }).click();
+  const votes: { awardId: number; value: number }[] = (await posted).postDataJSON().votes;
+  expect(votes.sort((a, b) => a.awardId - b.awardId)).toEqual([
+    { awardId: 1, value: 81 },
+    { awardId: 2, value: 40 },
+  ]);
   await expect(page.getByText("I tuoi voti")).toBeVisible();
   await expect(page.getByRole("slider")).toHaveCount(0);
   await expect(page.getByText("Miglior film: 81")).toBeVisible();
