@@ -18,3 +18,6 @@ export type MovieSearchResult = Ok<"searchMovies">;
 export type MovieView = MovieSearchResult["results"][number];
 export type ProgramItem = SeasonView["program"][number];
 export type MyVote = Ok<"getMyVotes">[number];
+export type AwardResult = Ok<"openEnvelope">;
+export type SeasonResults = Ok<"getSeasonResults">;
+export type SeasonSummary = Ok<"getSeasonSummary">;
