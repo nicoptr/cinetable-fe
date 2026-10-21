@@ -18,7 +18,7 @@ type Props = {
   addedLabel: string;
 };
 
-/** Elenco con aggiungi, modifica in linea ed elimina, per il presidente: serve sia alle categorie sia ai premi. */
+/** Elenco con aggiungi, modifica in linea ed elimina, per il presidente. */
 export function ItemEditor({ path, items, nameLabel, extraLabel, extraKey, newLabel, addedLabel }: Props) {
   const router = useRouter();
   const [adding, setAdding] = useState(false);

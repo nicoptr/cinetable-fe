@@ -13,7 +13,7 @@ export default async function CineforumLayout({ children, params }: { children: 
     <div data-wide className="md:grid md:grid-cols-[200px_minmax(0,1fr)] md:items-start md:gap-8">
       {/* su mobile i figli stanno nel flusso della pagina, così i tab restano sticky fino in fondo */}
       <div className="contents md:sticky md:top-6 md:block">
-        <Link href="/cineforums" className="inline-flex min-h-11 items-center text-sm text-muted hover:text-gold md:min-h-0">
+        <Link href="/cineforums" className="inline-flex min-h-11 items-center text-sm text-muted hover:text-gold">
           I miei cineforum
         </Link>
         <h1 className="font-serif text-3xl leading-tight md:text-2xl">{c.name}</h1>

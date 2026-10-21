@@ -10,9 +10,11 @@ export default async function AwardsPage({ params }: { params: Promise<{ id: str
   const path = `/cineforums/${id}/awards`;
   const [c, awards] = await Promise.all([apiServer<CineforumDetail>(`/cineforums/${id}`), apiServer<Award[]>(path)]);
   const items = awards.map((x) => ({ id: x.id, name: x.name, extra: x.question }));
+  const president = c.myRole === "PRESIDENT";
+  if (!president && items.length === 0) return <p className="text-muted">Nessun premio.</p>;
   return (
     <Section title={`Premi · ${items.length}`}>
-      {c.myRole === "PRESIDENT" ? (
+      {president ? (
         <ItemEditor
           path={path}
           items={items}

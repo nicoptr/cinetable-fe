@@ -3,13 +3,16 @@ import { notFound } from "next/navigation";
 import { Poster, Section } from "@/components/ui";
 import { apiServer } from "@/lib/api-server";
 import { formatDateTime } from "@/lib/format";
-import type { MyVote, SeasonView } from "@/lib/types";
+import type { CineforumDetail, MyVote, SeasonView } from "@/lib/types";
 import { PlanScreening, Voting, VoteForm } from "./FilmActions";
 
 export default async function FilmPage({ params }: { params: Promise<{ id: string; seasonId: string; order: string }> }) {
   const { id, seasonId, order } = await params;
   if (![id, seasonId, order].every((x) => /^\d+$/.test(x))) notFound();
-  const s = await apiServer<SeasonView>(`/cineforums/${id}/seasons/${seasonId}`);
+  const [s, c] = await Promise.all([
+    apiServer<SeasonView>(`/cineforums/${id}/seasons/${seasonId}`),
+    apiServer<CineforumDetail>(`/cineforums/${id}`),
+  ]);
   const item = s.program.find((p) => p.order === Number(order));
   if (!item) notFound();
   const base = `/cineforums/${id}/seasons/${seasonId}/program/${order}`;
@@ -20,9 +23,14 @@ export default async function FilmPage({ params }: { params: Promise<{ id: strin
 
   return (
     <>
-      <Link href={`/cineforums/${id}/seasons/${seasonId}`} className="mb-4 inline-flex min-h-11 items-center text-sm text-muted underline underline-offset-4 hover:text-gold print:hidden">
-        Torna all&apos;edizione
-      </Link>
+      <p className="mb-4 flex flex-wrap gap-x-6 print:hidden">
+        <Link href={`/cineforums/${id}`} className="inline-flex min-h-11 items-center text-sm text-muted hover:text-gold">
+          {c.name}
+        </Link>
+        <Link href={`/cineforums/${id}/seasons/${seasonId}`} className="inline-flex min-h-11 items-center text-sm text-muted underline underline-offset-4 hover:text-gold">
+          Torna all&apos;edizione
+        </Link>
+      </p>
       <header className="mb-8">
         <div className="mx-auto mb-5 w-52">
           <Poster movie={movie} size="lg" />

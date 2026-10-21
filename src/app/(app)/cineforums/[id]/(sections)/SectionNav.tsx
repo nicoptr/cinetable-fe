@@ -10,7 +10,6 @@ const SECTIONS = [
   { path: "/awards", label: "Premi" },
 ];
 
-/** Tab sottolineati sotto il titolo su mobile, colonna a sinistra da `md`. */
 export function SectionNav({ id }: { id: string }) {
   const pathname = usePathname();
   return (
@@ -26,7 +25,7 @@ export function SectionNav({ id }: { id: string }) {
             key={path}
             href={href}
             aria-current={active ? "page" : undefined}
-            className={`flex min-h-11 shrink-0 items-center border-b-2 whitespace-nowrap md:min-h-10 md:rounded-lg md:border-b-0 md:border-l-2 md:px-3 ${
+            className={`flex min-h-11 shrink-0 items-center border-b-2 whitespace-nowrap focus-visible:outline-offset-[-2px]! md:rounded-lg md:border-b-0 md:border-l-2 md:px-3 ${
               active ? "border-gold text-ink md:bg-gold/8 md:text-gold" : "border-transparent text-muted hover:text-ink"
             }`}
           >

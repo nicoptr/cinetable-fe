@@ -4,20 +4,28 @@ import { AwardWinners, formatAverage, formatVotes } from "@/components/AwardWinn
 import { Avatar, PageTitle, Poster, Section } from "@/components/ui";
 import { apiServer } from "@/lib/api-server";
 import { formatDate, formatDateTime } from "@/lib/format";
-import type { SeasonSummary } from "@/lib/types";
+import type { CineforumDetail, SeasonSummary } from "@/lib/types";
 
 export default async function SummaryPage({ params }: { params: Promise<{ id: string; seasonId: string }> }) {
   const { id, seasonId } = await params;
   if (!/^\d+$/.test(id) || !/^\d+$/.test(seasonId)) notFound();
   const base = `/cineforums/${id}/seasons/${seasonId}`;
-  const { season, awards, films, participants } = await apiServer<SeasonSummary>(`${base}/summary`);
+  const [{ season, awards, films, participants }, c] = await Promise.all([
+    apiServer<SeasonSummary>(`${base}/summary`),
+    apiServer<CineforumDetail>(`/cineforums/${id}`),
+  ]);
   const awardName = new Map(awards.map((a) => [a.awardId, a.name]));
 
   return (
     <>
-      <Link href={base} className="mb-4 inline-flex min-h-11 items-center text-sm text-muted underline underline-offset-4 hover:text-gold print:hidden">
-        Torna all&apos;edizione
-      </Link>
+      <p className="mb-4 flex flex-wrap gap-x-6 print:hidden">
+        <Link href={`/cineforums/${id}`} className="inline-flex min-h-11 items-center text-sm text-muted hover:text-gold">
+          {c.name}
+        </Link>
+        <Link href={base} className="inline-flex min-h-11 items-center text-sm text-muted underline underline-offset-4 hover:text-gold">
+          Torna all&apos;edizione
+        </Link>
+      </p>
       <PageTitle>{season.name}</PageTitle>
       {season.description && <p className="mb-2">{season.description}</p>}
       <p className="mb-8 text-sm text-muted">

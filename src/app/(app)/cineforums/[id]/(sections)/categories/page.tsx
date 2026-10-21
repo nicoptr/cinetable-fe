@@ -10,9 +10,11 @@ export default async function CategoriesPage({ params }: { params: Promise<{ id:
   const path = `/cineforums/${id}/categories`;
   const [c, categories] = await Promise.all([apiServer<CineforumDetail>(`/cineforums/${id}`), apiServer<Category[]>(path)]);
   const items = categories.map((x) => ({ id: x.id, name: x.name, extra: x.description ?? "" }));
+  const president = c.myRole === "PRESIDENT";
+  if (!president && items.length === 0) return <p className="text-muted">Nessuna categoria.</p>;
   return (
     <Section title={`Categorie · ${items.length}`}>
-      {c.myRole === "PRESIDENT" ? (
+      {president ? (
         <ItemEditor
           path={path}
           items={items}

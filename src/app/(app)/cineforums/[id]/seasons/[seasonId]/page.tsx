@@ -21,7 +21,10 @@ const STATUS: Record<SeasonView["status"], string> = {
 export default async function SeasonPage({ params }: { params: Promise<{ id: string; seasonId: string }> }) {
   const { id, seasonId } = await params;
   if (!/^\d+$/.test(id) || !/^\d+$/.test(seasonId)) notFound();
-  const s = await apiServer<SeasonView>(`/cineforums/${id}/seasons/${seasonId}`);
+  const [s, c] = await Promise.all([
+    apiServer<SeasonView>(`/cineforums/${id}/seasons/${seasonId}`),
+    apiServer<CineforumDetail>(`/cineforums/${id}`),
+  ]);
   const president = s.myRole === "PRESIDENT";
   const base = `/cineforums/${id}/seasons/${seasonId}`;
   const canReveal =
@@ -34,12 +37,15 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
     final ? apiServer<SeasonResults>(`${base}/results`) : null,
     s.status === "OPEN" && s.isParticipant ? apiServer<MyCandidature>(`${base}/candidature`) : null,
     s.status === "OPEN" && president ? apiServer<CandidatureProgress>(`${base}/progress`) : null,
-    s.status === "DRAFT" && president ? editorData(id) : null,
+    s.status === "DRAFT" && president ? editorData(id, c) : null,
   ]);
   const label =
     s.status === "OPEN" && new Date(s.candidaturesCloseAt) <= new Date() ? "Candidature chiuse" : finalNight && s.status === "SCREENING" ? "Serata finale" : STATUS[s.status];
   return (
     <>
+      <Link href={`/cineforums/${id}`} className="inline-flex min-h-11 items-center text-sm text-muted hover:text-gold print:hidden">
+        {c.name}
+      </Link>
       <PageTitle>{s.name}</PageTitle>
       <p className="eyebrow mb-1">{label}</p>
       {s.status !== "OPEN" && (
@@ -87,9 +93,8 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
   );
 }
 
-async function editorData(id: string) {
-  const [c, categories, awards] = await Promise.all([
-    apiServer<CineforumDetail>(`/cineforums/${id}`),
+async function editorData(id: string, c: CineforumDetail) {
+  const [categories, awards] = await Promise.all([
     apiServer<Category[]>(`/cineforums/${id}/categories`),
     apiServer<Award[]>(`/cineforums/${id}/awards`),
   ]);
