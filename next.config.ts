@@ -9,6 +9,8 @@ if (process.env.NODE_ENV === "production") {
 const backend = process.env.BACKEND_URL ?? "http://localhost:5000";
 
 const nextConfig: NextConfig = {
+  // gli e2e usano una cartella loro: Next 16 non avvia un secondo `next dev` sulla stessa
+  distDir: process.env.NEXT_DIST_DIR ?? ".next",
   poweredByHeader: false,
   turbopack: {
     rules: {

@@ -22,7 +22,7 @@ export default defineConfig({
     {
       command: "npx next dev -p 3055",
       url: "http://localhost:3055",
-      env: { BACKEND_URL: "http://localhost:5055" },
+      env: { BACKEND_URL: "http://localhost:5055", NEXT_DIST_DIR: ".next-e2e" },
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },
