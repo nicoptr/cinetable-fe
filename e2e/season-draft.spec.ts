@@ -64,7 +64,7 @@ test("bozza incompleta: si salva, l'avvio elenca i problemi accanto al bottone, 
   await page.getByRole("button", { name: /Tocca di nuovo/ }).click();
   const problems = page.getByRole("alert").filter({ hasText: "Per avviare l'edizione:" });
   await expect(problems).toContainText("aggiungi almeno 2 partecipanti");
-  await expect(problems).toContainText("non puoi avere più categorie che partecipanti");
+  await expect(problems).toContainText("il numero dei partecipanti deve essere un multiplo di quello delle categorie");
   await expect(page.getByText("Bozza", { exact: true })).toBeVisible();
   await expect(page.getByRole("status", { name: "Avvisi" }).getByRole("listitem")).toHaveCount(0);
 

@@ -72,7 +72,8 @@ export function Curtain() {
     const key = sectionKey(pathname);
     if (key === shownKey.current) return;
     shownKey.current = key;
-    if (reducedMotion()) return;
+    // una chiusura da clic in corso finisce con la sua navigazione, che riapre il sipario
+    if (reducedMotion() || curtain.dataset.state === "closing") return;
     if (curtain.dataset.state !== "closed") {
       curtain.dataset.state = "closed";
       closedAt.current = Date.now();
