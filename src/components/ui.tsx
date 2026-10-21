@@ -38,20 +38,26 @@ type ConfirmButtonProps = Omit<ButtonProps, "onClick" | "pending"> & {
   confirmLabel?: string;
 };
 
-/** Primo tocco: chiede conferma per 4 s. Secondo tocco: esegue `onConfirm` e resta in attesa finché non finisce. */
-export function ConfirmButton({ onConfirm, confirmLabel = "Tocca di nuovo per confermare", children, ...rest }: ConfirmButtonProps) {
+/**
+ * Due tocchi per le azioni irreversibili: il primo arma per 4 s, il secondo esegue `onConfirm`
+ * e resta `pending` finché non finisce. Un ref blocca i tocchi in più prima del nuovo render.
+ */
+export function useConfirm(onConfirm: () => unknown) {
   const [armed, setArmed] = useState(false);
   const [pending, setPending] = useState(false);
+  const busy = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
 
   async function click() {
+    if (busy.current) return;
     if (!armed) {
       setArmed(true);
       timer.current = setTimeout(() => setArmed(false), CONFIRM_MS);
       return;
     }
     clearTimeout(timer.current);
+    busy.current = true;
     setArmed(false);
     setPending(true);
     try {
@@ -59,10 +65,16 @@ export function ConfirmButton({ onConfirm, confirmLabel = "Tocca di nuovo per co
     } catch {
       // l'errore lo mostra il chiamante; qui basta non lasciarlo senza gestione
     } finally {
+      busy.current = false;
       setPending(false);
     }
   }
+  return { armed, pending, click };
+}
 
+/** Primo tocco: chiede conferma per 4 s. Secondo tocco: esegue `onConfirm` e resta in attesa finché non finisce. */
+export function ConfirmButton({ onConfirm, confirmLabel = "Tocca di nuovo per confermare", children, ...rest }: ConfirmButtonProps) {
+  const { armed, pending, click } = useConfirm(onConfirm);
   return (
     <Button {...rest} pending={pending} onClick={click} aria-live="polite">
       {armed ? confirmLabel : children}

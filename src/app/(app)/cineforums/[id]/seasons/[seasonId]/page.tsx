@@ -5,6 +5,8 @@ import { formatDateTime } from "@/lib/format";
 import type { Award, Category, CandidatureProgress, CineforumDetail, MyCandidature, SeasonView } from "@/lib/types";
 import { Draft } from "./_draft";
 import { Open } from "./_open";
+import { RevealNext } from "./_reveal";
+import { Screening } from "./_screening";
 
 const STATUS: Record<SeasonView["status"], string> = {
   DRAFT: "Bozza",
@@ -19,6 +21,11 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
   if (!/^\d+$/.test(id) || !/^\d+$/.test(seasonId)) notFound();
   const s = await apiServer<SeasonView>(`/cineforums/${id}/seasons/${seasonId}`);
   const president = s.myRole === "PRESIDENT";
+  const base = `/cineforums/${id}/seasons/${seasonId}`;
+  const canReveal =
+    s.status === "OPEN"
+      ? new Date(s.candidaturesCloseAt) <= new Date() && s.candidatures.valid === s.candidatures.expected
+      : s.status === "SCREENING" && s.remainingToReveal > 0;
   return (
     <>
       <PageTitle>{s.name}</PageTitle>
@@ -29,6 +36,8 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
           {s.finalNightAt && ` · serata finale ${formatDateTime(s.finalNightAt)}`}
         </p>
       )}
+      {/* stesso punto dell'albero in OPEN e SCREENING: la busta aperta sopravvive al cambio di stato */}
+      {president && (s.status === "OPEN" || s.status === "SCREENING") && <RevealNext base={base} next={s.program.length + 1} available={canReveal} />}
       {s.status === "DRAFT" ? (
         <Draft
           cineforumId={id}
@@ -43,8 +52,10 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
           mine={s.isParticipant ? await apiServer<MyCandidature>(`/cineforums/${id}/seasons/${seasonId}/candidature`) : null}
           progress={president ? await apiServer<CandidatureProgress>(`/cineforums/${id}/seasons/${seasonId}/progress`) : null}
         />
+      ) : s.status === "SCREENING" ? (
+        <Screening base={base} season={s} />
       ) : (
-        // SCREENING, FINAL e DONE: viste nei task successivi
+        // FINAL e DONE: viste nei task successivi
         <p className="text-muted">Questa fase della rassegna sarà disponibile a breve.</p>
       )}
     </>

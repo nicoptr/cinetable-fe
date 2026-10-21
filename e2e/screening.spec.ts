@@ -1,0 +1,135 @@
+import type { Page } from "@playwright/test";
+import { expect, loginAs, seed, test, type Player } from "./helpers";
+import { isoToRomeLocal } from "../src/lib/format";
+
+const SEASON = "/cineforums/1/seasons/1";
+const API = `/api${SEASON}`;
+// chi ha candidato cosa nel seed (cinofili-be/scripts/e2e-seed.js)
+const PROPOSER: Record<number, Player> = { 1091: "anna", 620: "bruno", 550: "carla", 11216: "dario" };
+const TITLES = /La cosa|Ghostbusters|Fight Club|Nuovo Cinema Paradiso/;
+
+type Item = { order: number; movie: { tmdbId: number; title: string } };
+
+async function program(page: Page): Promise<Item[]> {
+  const res = await page.request.get(API);
+  expect(res.ok()).toBe(true);
+  return (await res.json()).program;
+}
+
+async function switchTo(page: Page, who: Player) {
+  await page.context().clearCookies();
+  await loginAs(page, who);
+}
+
+const envelope = (page: Page, n: number) => page.getByRole("button", { name: new RegExp(`Film n\\. ${n}`) });
+
+test("anna svela il primo film con la busta e lo vede nel programma", async ({ page }) => {
+  seed("screening");
+  await loginAs(page, "anna");
+  await page.goto(SEASON);
+  await envelope(page, 1).click();
+  await expect(envelope(page, 1)).toContainText("Tocca di nuovo per aprire");
+  await envelope(page, 1).click();
+  const reveal = page.getByRole("region", { name: "Film n. 1" });
+  await expect(reveal.getByRole("heading", { name: TITLES })).toBeVisible();
+  const [first] = await program(page);
+  expect(first.order).toBe(1);
+  await expect(reveal.getByRole("heading")).toHaveText(first.movie.title);
+  const list = page.getByRole("list", { name: "Programma" });
+  await expect(list.getByRole("link")).toHaveCount(1);
+  await expect(list.getByRole("link")).toContainText(first.movie.title);
+  await expect(list.getByLabel("Film da svelare")).toHaveCount(3);
+  // il prossimo si svela solo dopo la proiezione
+  await expect(page.getByText("In proiezione")).toBeVisible();
+});
+
+test("doppio tocco sulla busta non svela due film", async ({ page }) => {
+  seed("screening");
+  await loginAs(page, "anna");
+  await page.goto(SEASON);
+  const env = envelope(page, 1);
+  await env.click();
+  await env.click();
+  await env.click({ force: true, timeout: 1000 }).catch(() => {}); // terzo tocco a richiesta in corso
+  await expect(page.getByRole("region", { name: "Film n. 1" }).getByRole("heading", { name: TITLES })).toBeVisible();
+  expect(await program(page)).toHaveLength(1);
+  await expect(page.getByRole("list", { name: "Programma" }).getByRole("link")).toHaveCount(1);
+});
+
+test("programmo la proiezione e apro il voto; bruno vota con gli slider", async ({ page }) => {
+  seed("screening");
+  await loginAs(page, "anna");
+  const res = await page.request.post(`${API}/reveal-next`);
+  expect(res.ok()).toBe(true);
+  const item: Item = await res.json();
+  await page.goto(`${SEASON}/films/1`);
+  await expect(page.getByRole("heading", { name: item.movie.title, level: 1 })).toBeVisible();
+
+  await page.getByLabel("Data e ora").fill(isoToRomeLocal(new Date(Date.now() - 86400000).toISOString()));
+  await page.getByLabel("Luogo").fill("Sala Verdi");
+  await page.getByRole("button", { name: "Salva la proiezione" }).click();
+  await expect(page.getByText("Sala Verdi")).toBeVisible();
+  const open = page.getByRole("button", { name: "Apri il voto" });
+  await open.click();
+  await page.getByRole("button", { name: "Tocca di nuovo per confermare" }).click();
+  await expect(page.getByText("Mancano 3 voti")).toBeVisible();
+
+  const voter: Player = PROPOSER[item.movie.tmdbId] === "bruno" ? "carla" : "bruno";
+  await switchTo(page, voter);
+  await page.goto(SEASON);
+  await expect(page.getByRole("list", { name: "Programma" }).getByText("Voto aperto")).toBeVisible();
+  await page.getByRole("list", { name: "Programma" }).getByRole("link").click();
+  await expect(page).toHaveURL(new RegExp(`${SEASON}/films/1$`));
+
+  const film = page.getByRole("slider", { name: /Miglior film/ });
+  await expect(film).toHaveAccessibleName(/Quanto ti è piaciuto\?/);
+  await film.fill("80");
+  await film.press("ArrowRight");
+  await expect(page.getByRole("status").filter({ hasText: "81" })).toBeVisible();
+  await page.getByRole("slider", { name: /Miglior regia/ }).fill("40");
+  await expect(page.getByText("I voti non si possono modificare")).toBeVisible();
+  await page.getByRole("button", { name: "Invia i voti" }).click();
+  await page.getByRole("button", { name: "Tocca di nuovo per confermare" }).click();
+  await expect(page.getByText("I tuoi voti")).toBeVisible();
+  await expect(page.getByRole("slider")).toHaveCount(0);
+  await expect(page.getByText("Miglior film: 81")).toBeVisible();
+  await expect(page.getByText("Miglior regia: 40")).toBeVisible();
+
+  await page.goto(SEASON);
+  await expect(page.getByRole("list", { name: "Programma" }).getByText("Hai votato")).toBeVisible();
+  await switchTo(page, "anna");
+  await page.goto(`${SEASON}/films/1`);
+  await expect(page.getByText("Mancano 2 voti")).toBeVisible();
+  await page.getByRole("button", { name: "Sollecita" }).click();
+  await expect(page.getByText("Sollecito inviato a 2 persone")).toBeVisible();
+});
+
+test("il proponente vede 'Questo è il tuo film'", async ({ page }) => {
+  seed("final"); // ordine fisso: 2 = Ghostbusters di bruno
+  await loginAs(page, "bruno");
+  await page.goto(SEASON);
+  await expect(page.getByRole("list", { name: "Programma" }).getByRole("link", { name: /Ghostbusters/ })).toContainText("Il tuo film");
+  await page.goto(`${SEASON}/films/2`);
+  await expect(page.getByText("Questo è il tuo film: non puoi votarlo")).toBeVisible();
+  await expect(page.getByRole("slider")).toHaveCount(0);
+});
+
+test("film inesistente: 404", async ({ page }) => {
+  seed("final");
+  await loginAs(page, "bruno");
+  const res = await page.goto(`${SEASON}/films/9`);
+  expect(res?.status()).toBe(404);
+});
+
+test("con prefers-reduced-motion la busta si apre comunque", async ({ page }) => {
+  seed("screening");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await loginAs(page, "anna");
+  await page.goto(SEASON);
+  await envelope(page, 1).click();
+  await envelope(page, 1).click();
+  const reveal = page.getByRole("region", { name: "Film n. 1" });
+  await expect(reveal.getByRole("heading", { name: TITLES })).toBeVisible();
+  const [first] = await program(page);
+  await expect(reveal.getByRole("heading")).toHaveText(first.movie.title);
+});

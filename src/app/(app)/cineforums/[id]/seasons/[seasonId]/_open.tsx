@@ -105,13 +105,7 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
               Salva scadenza
             </Button>
           </form>
-          {passed && valid === expected && (
-            <div className="mt-6">
-              <Button disabled={busy} onClick={() => run(() => api(`${base}/reveal-next`, { method: "POST" }))}>
-                Svela il primo film
-              </Button>
-            </div>
-          )}
+          {passed && valid === expected && <p className="mt-6 text-muted">Tutti i film sono pronti: apri la busta in cima per svelare il primo.</p>}
         </section>
       )}
       {error && <Notice tone="error">{error}</Notice>}
