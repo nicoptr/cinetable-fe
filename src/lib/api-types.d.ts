@@ -576,6 +576,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sub/api/cineforums/{id}/seasons/{seasonId}/next-screening": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Set date and place of the next movie before revealing it (president only) */
+        post: operations["scheduleNextScreening"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sub/api/cineforums/{id}/seasons/{seasonId}/program/{order}/screening": {
         parameters: {
             query?: never;
@@ -1622,6 +1639,11 @@ export interface operations {
                             votesMissing?: number;
                         }[];
                         remainingToReveal: number;
+                        nextScreening: {
+                            screeningAt: string;
+                            location: string;
+                            categoryName: string | null;
+                        } | null;
                     };
                 };
             };
@@ -1699,6 +1721,11 @@ export interface operations {
                             votesMissing?: number;
                         }[];
                         remainingToReveal: number;
+                        nextScreening: {
+                            screeningAt: string;
+                            location: string;
+                            categoryName: string | null;
+                        } | null;
                     };
                 };
             };
@@ -1808,6 +1835,11 @@ export interface operations {
                             votesMissing?: number;
                         }[];
                         remainingToReveal: number;
+                        nextScreening: {
+                            screeningAt: string;
+                            location: string;
+                            categoryName: string | null;
+                        } | null;
                     };
                 };
             };
@@ -1885,6 +1917,11 @@ export interface operations {
                             votesMissing?: number;
                         }[];
                         remainingToReveal: number;
+                        nextScreening: {
+                            screeningAt: string;
+                            location: string;
+                            categoryName: string | null;
+                        } | null;
                     };
                 };
             };
@@ -2258,6 +2295,38 @@ export interface operations {
                         isMine: boolean;
                         myVoteSubmitted: boolean;
                         votesMissing?: number;
+                    };
+                };
+            };
+        };
+    };
+    scheduleNextScreening: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: date-time */
+                    screeningAt: string;
+                    location: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        screeningAt: string;
+                        location: string;
+                        categoryName: string | null;
                     };
                 };
             };
