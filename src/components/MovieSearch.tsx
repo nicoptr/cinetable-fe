@@ -25,7 +25,7 @@ export function MovieSearch({ candidatureUrl, onDone }: { candidatureUrl: string
     setBusy(true);
     setError(null);
     try {
-      const r = await api<MovieSearchResult>(`/movies/search?q=${encodeURIComponent(t)}&page=${p}`);
+      const r = await api<MovieSearchResult>(`/movies/search?q=${encodeURIComponent(t)}&page=${p}`, { quiet: true });
       if (id !== seq.current) return;
       setMovies((prev) => (p === 1 ? r.results : [...prev, ...r.results]));
       setPage(p);
@@ -66,7 +66,7 @@ export function MovieSearch({ candidatureUrl, onDone }: { candidatureUrl: string
     setBusy(true);
     setError(null);
     try {
-      await api(candidatureUrl, { method: "PUT", body: { tmdbId: pick.tmdbId } });
+      await api(candidatureUrl, { quiet: true, method: "PUT", body: { tmdbId: pick.tmdbId } });
       onDone();
     } catch (e) {
       setError(msg(e));

@@ -43,7 +43,7 @@ export function PlanScreening({ base, screeningAt, location }: { base: string; s
         onSubmit={(e) => {
           e.preventDefault();
           const f = new FormData(e.currentTarget);
-          void run(() => api(`${base}/screening`, { method: "PATCH", body: { screeningAt: romeLocalToIso(String(f.get("at"))), location: f.get("location") } }));
+          void run(() => api(`${base}/screening`, { quiet: true, method: "PATCH", body: { screeningAt: romeLocalToIso(String(f.get("at"))), location: f.get("location") } }));
         }}
       >
         <Field label="Data e ora" name="at" type="datetime-local" defaultValue={screeningAt ? isoToRomeLocal(screeningAt) : ""} required />
@@ -63,7 +63,7 @@ export function Voting({ base, votingOpen, votesMissing }: { base: string; votin
     <section className="mb-8">
       {error && <Notice tone="error">{error}</Notice>}
       {!votingOpen ? (
-        <ConfirmButton onConfirm={() => run(() => api(`${base}/open-voting`, { method: "POST" }))}>Apri il voto</ConfirmButton>
+        <ConfirmButton onConfirm={() => run(() => api(`${base}/open-voting`, { quiet: true, method: "POST" }))}>Apri il voto</ConfirmButton>
       ) : (
         <>
           <p className="mb-2">{votesMissing === 0 ? "Hanno votato tutti" : votesMissing === 1 ? "Manca 1 voto" : `Mancano ${votesMissing} voti`}</p>
@@ -74,7 +74,7 @@ export function Voting({ base, votingOpen, votesMissing }: { base: string; votin
               pending={busy}
               pendingLabel="Invio…"
               onClick={async () => {
-                await run(async () => setSent((await api<{ sent: number }>(`${base}/vote-reminder`, { method: "POST" })).sent));
+                await run(async () => setSent((await api<{ sent: number }>(`${base}/vote-reminder`, { quiet: true, method: "POST" })).sent));
               }}
             >
               Sollecita
@@ -129,7 +129,7 @@ export function VoteForm({ base, awards }: { base: string; awards: SeasonView["a
       <ConfirmButton
         disabled={sent || !allTouched}
         onConfirm={async () => {
-          const ok = await run(() => api(`${base}/votes`, { method: "POST", body: { votes: Object.entries(values).map(([id, value]) => ({ awardId: Number(id), value })) } }));
+          const ok = await run(() => api(`${base}/votes`, { quiet: true, method: "POST", body: { votes: Object.entries(values).map(([id, value]) => ({ awardId: Number(id), value })) } }));
           if (ok) setSent(true);
         }}
       >

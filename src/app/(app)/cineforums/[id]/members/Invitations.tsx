@@ -41,7 +41,7 @@ export function Invitations({ cineforumId, initial }: { cineforumId: string; ini
     e.preventDefault();
     const emails = text.split(/[\s,;]+/).filter(Boolean);
     if (emails.length === 0) return setMsg({ row: 0, tone: "error", text: "Inserisci almeno un'email" });
-    const sent = await run(0, () => api<InvitationView[]>(base, { method: "POST", body: { emails } }));
+    const sent = await run(0, () => api<InvitationView[]>(base, { quiet: true, method: "POST", body: { emails } }));
     if (!sent) return;
     setText("");
     const distinct = new Set(emails.map((x) => x.toLowerCase())).size;
@@ -49,7 +49,7 @@ export function Invitations({ cineforumId, initial }: { cineforumId: string; ini
   }
 
   async function resend(i: InvitationView) {
-    if (await run(i.id, () => api(`${base}/${i.id}/resend`, { method: "POST" }))) setMsg({ row: i.id, tone: "success", text: "Invito rimandato" });
+    if (await run(i.id, () => api(`${base}/${i.id}/resend`, { quiet: true, method: "POST" }))) setMsg({ row: i.id, tone: "success", text: "Invito rimandato" });
   }
 
   const note = (row: number) =>
@@ -83,7 +83,7 @@ export function Invitations({ cineforumId, initial }: { cineforumId: string; ini
                 <Button variant="secondary" disabled={busy} onClick={() => resend(i)}>
                   Rimanda
                 </Button>
-                <ConfirmButton variant="danger" disabled={busy} onConfirm={() => run(i.id, () => api(`${base}/${i.id}`, { method: "DELETE" }))}>
+                <ConfirmButton variant="danger" disabled={busy} onConfirm={() => run(i.id, () => api(`${base}/${i.id}`, { quiet: true, method: "DELETE" }))}>
                   Revoca
                 </ConfirmButton>
               </div>

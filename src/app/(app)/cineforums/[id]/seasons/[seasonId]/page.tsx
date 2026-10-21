@@ -52,9 +52,9 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
       {president && (s.status === "OPEN" || s.status === "SCREENING") && <RevealNext base={base} next={s.program.length + 1} available={canReveal} />}
       {s.status === "DONE" && (
         <div className="mb-8 border-y border-gold py-4 text-center">
-          <p className="font-serif text-2xl text-gold">Rassegna conclusa</p>
+          <p className="font-serif text-2xl text-gold">Edizione conclusa</p>
           <Link href={`${base}/summary`} className="mt-2 inline-flex min-h-11 items-center underline underline-offset-4 hover:text-gold">
-            Scheda della rassegna
+            Scheda dell&apos;edizione
           </Link>
         </div>
       )}

@@ -20,7 +20,7 @@ async function open(page: Page, award: string) {
   await envelope(page, award).click();
 }
 
-test("anna apre le due buste; all'ultima la rassegna è conclusa", async ({ page }) => {
+test("anna apre le due buste; all'ultima l'edizione è conclusa", async ({ page }) => {
   seed("final");
   await loginAs(page, "anna");
   await page.goto(SEASON);
@@ -41,8 +41,8 @@ test("anna apre le due buste; all'ultima la rassegna è conclusa", async ({ page
   await expect(direction).toContainText("proposto da anna");
 
   await page.reload();
-  await expect(page.getByText("Rassegna conclusa")).toBeVisible();
-  await page.getByRole("link", { name: "Scheda della rassegna" }).click();
+  await expect(page.getByText("Edizione conclusa")).toBeVisible();
+  await page.getByRole("link", { name: "Scheda dell'edizione" }).click();
   await expect(page).toHaveURL(SUMMARY);
   await expectNoHorizontalScroll(page);
 });
@@ -116,7 +116,7 @@ test("la scheda mostra albo d'oro, film in ordine con medie, nessun voto singolo
   seed("done");
   await loginAs(page, "bruno");
   await page.goto(SEASON);
-  await expect(page.getByText("Rassegna conclusa")).toBeVisible();
+  await expect(page.getByText("Edizione conclusa")).toBeVisible();
   const results = page.getByRole("region", { name: "Risultati" });
   await expect(results.getByRole("heading", { level: 3 })).toHaveText(["Miglior film", "Miglior regia"]);
 

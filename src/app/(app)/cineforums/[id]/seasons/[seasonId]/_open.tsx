@@ -4,14 +4,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, ConfirmButton, Field, Notice, Poster } from "@/components/ui";
 import { MovieSearch } from "@/components/MovieSearch";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { formatDateTime, isoToRomeLocal, romeLocalToIso } from "@/lib/format";
 import type { CandidatureProgress, MyCandidature, SeasonView } from "@/lib/types";
 
 export function Open({ cineforumId, season, mine, progress }: { cineforumId: string; season: SeasonView; mine: MyCandidature | null; progress: CandidatureProgress | null }) {
   const router = useRouter();
   const [searching, setSearching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const serverCloseAt = isoToRomeLocal(season.candidaturesCloseAt);
   const [edit, setEdit] = useState({ from: serverCloseAt, value: serverCloseAt });
@@ -22,14 +21,14 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
   const { valid, expected } = season.candidatures;
   const passed = new Date(season.candidaturesCloseAt) <= new Date();
 
+  /** L'errore lo mostra l'avviso di api(): qui niente messaggio in fondo alla pagina, lontano dalla riga. */
   async function run(fn: () => Promise<void>) {
     setBusy(true);
-    setError(null);
     try {
       await fn();
       router.refresh();
-    } catch (err) {
-      setError((err as ApiError).message);
+    } catch {
+      // già mostrato
     } finally {
       setBusy(false);
     }
@@ -87,7 +86,7 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
                 <li key={p.userId} className="flex items-center justify-between gap-3 border-b border-line py-1">
                   <span>{p.username}</span>
                   <ConfirmButton variant="danger" disabled={busy} onConfirm={() => run(() => api(`${base}/participants/${p.userId}`, { method: "DELETE" }))}>
-                    Togli dalla rassegna
+                    Togli dall&apos;edizione
                   </ConfirmButton>
                 </li>
               ))}
@@ -108,7 +107,6 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
           {passed && valid === expected && <p className="mt-6 text-muted">Tutti i film sono pronti: apri la busta in cima per svelare il primo.</p>}
         </section>
       )}
-      {error && <Notice tone="error">{error}</Notice>}
     </>
   );
 }

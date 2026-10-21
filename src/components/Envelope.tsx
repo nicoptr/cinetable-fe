@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Notice, useConfirm } from "@/components/ui";
-import { ApiError } from "@/lib/api";
+import { errorText } from "@/lib/api";
 
 const SPARKS = Array.from({ length: 12 }, (_, i) => ({ "--a": `${i * 30 + (i % 2) * 11}deg`, "--d": `${64 + (i % 3) * 22}px` }) as CSSProperties);
 
@@ -29,8 +29,7 @@ export function Envelope({ label, onOpen, disabled = false }: { label: string; o
     try {
       setOpened({ label, content: await onOpen() });
     } catch (err) {
-      const down = !(err instanceof ApiError) || err.status === 0 || err.status === 429 || err.status >= 500;
-      setError(down ? "Servizio non disponibile, riprova tra poco" : err.message);
+      setError(errorText(err));
     }
   });
 

@@ -15,7 +15,7 @@ export default async function NewSeasonPage({ params }: { params: Promise<{ id: 
   ]);
   return (
     <>
-      <PageTitle>Nuova rassegna</PageTitle>
+      <PageTitle>Nuova edizione</PageTitle>
       <SeasonForm cineforumId={id} categories={categories} awards={awards} members={c.members} />
     </>
   );

@@ -43,8 +43,8 @@ export default async function CineforumPage({ params }: { params: Promise<{ id: 
           </Link>
         )}
       </nav>
-      <h2 className="mt-8 mb-2 font-serif text-2xl">Rassegne</h2>
-      {seasons.length === 0 && <p className="text-muted">Nessuna rassegna.</p>}
+      <h2 className="mt-8 mb-2 font-serif text-2xl">Edizioni</h2>
+      {seasons.length === 0 && <p className="text-muted">Nessuna edizione.</p>}
       <ul>
         {seasons.map((s) => (
           <li key={s.id} className="border-t border-line first:border-t-0">
@@ -60,7 +60,7 @@ export default async function CineforumPage({ params }: { params: Promise<{ id: 
       </ul>
       {president && (
         <Link href={`/cineforums/${id}/seasons/new`} className="mt-6 inline-flex min-h-11 items-center justify-center rounded border border-gold px-5 text-gold hover:bg-gold/10">
-          Nuova rassegna
+          Nuova edizione
         </Link>
       )}
     </>

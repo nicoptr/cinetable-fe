@@ -10,7 +10,7 @@ import type { ProgramItem } from "@/lib/types";
 /**
  * Busta "Film n. <prossimo>" del presidente, in OPEN (primo svelamento) e in SCREENING.
  * Sta nello stesso punto dell'albero in entrambe le viste: dopo `router.refresh()` (che può
- * passare la rassegna da OPEN a SCREENING) resta montata e aperta sul film appena svelato.
+ * passare l'edizione da OPEN a SCREENING) resta montata e aperta sul film appena svelato.
  */
 export function RevealNext({ base, next, available }: { base: string; next: number; available: boolean }) {
   const router = useRouter();
@@ -21,7 +21,7 @@ export function RevealNext({ base, next, available }: { base: string; next: numb
       label={`Film n. ${next}`}
       onOpen={async () => {
         // anche dopo un errore: il server può aver già cambiato stato (es. svelato da un'altra scheda)
-        const item = await api<ProgramItem>(`${base}/reveal-next`, { method: "POST" }).finally(() => router.refresh());
+        const item = await api<ProgramItem>(`${base}/reveal-next`, { quiet: true, method: "POST" }).finally(() => router.refresh());
         setOpened(true);
         return <Revealed item={item} />;
       }}

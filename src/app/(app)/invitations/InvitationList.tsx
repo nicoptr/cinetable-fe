@@ -17,7 +17,7 @@ export function InvitationList({ initial }: { initial: MyInvitation[] }) {
     setBusy(i.id);
     setError(null);
     try {
-      const r = await api<{ cineforumId: number } | undefined>(`/invitations/${i.id}/${action}`, { method: "POST" });
+      const r = await api<{ cineforumId: number } | undefined>(`/invitations/${i.id}/${action}`, { quiet: true, method: "POST" });
       if (action === "accept" && r) router.push(`/cineforums/${r.cineforumId}`);
       router.refresh();
       setBusy(null);

@@ -483,7 +483,7 @@ button.env[data-pending] .env-seal {
   }
 }
 
-/* Stampa, su ogni pagina (pensata per la scheda della rassegna): fondo bianco, testo nero, niente menu */
+/* Stampa, su ogni pagina (pensata per la scheda dell'edizione): fondo bianco, testo nero, niente menu */
 @media print {
   :root {
     --color-bg: #fff;

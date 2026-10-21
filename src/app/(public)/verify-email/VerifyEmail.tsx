@@ -12,7 +12,7 @@ export function VerifyEmail({ token }: { token: string }) {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    api("/auth/verify-email", { method: "POST", body: { token } })
+    api("/auth/verify-email", { quiet: true, method: "POST", body: { token } })
       .then(() => {
         setState("ok");
         // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- ricarica piena: il server deve vedere il cookie

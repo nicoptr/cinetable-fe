@@ -60,11 +60,11 @@ export function SeasonForm({ cineforumId, categories, awards, members, season, o
     };
     try {
       if (season) {
-        await api(`/cineforums/${cineforumId}/seasons/${season.id}`, { method: "PATCH", body });
+        await api(`/cineforums/${cineforumId}/seasons/${season.id}`, { quiet: true, method: "PATCH", body });
         router.refresh();
         onDone?.();
       } else {
-        const s = await api<{ id: number }>(`/cineforums/${cineforumId}/seasons`, { method: "POST", body });
+        const s = await api<{ id: number }>(`/cineforums/${cineforumId}/seasons`, { quiet: true, method: "POST", body });
         router.push(`/cineforums/${cineforumId}/seasons/${s.id}`);
         router.refresh();
       }

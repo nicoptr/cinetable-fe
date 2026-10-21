@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { Button, Field, Notice } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
@@ -26,6 +27,7 @@ function useSubmit(run: () => Promise<void>, done: string) {
 }
 
 export function ProfileForm({ username: u, avatarUrl: a }: { username: string; avatarUrl: string }) {
+  const router = useRouter();
   const [username, setUsername] = useState(u);
   const [avatarUrl, setAvatarUrl] = useState(a);
   const [preview, setPreview] = useState(a.startsWith("https://") ? a : "");
@@ -35,7 +37,10 @@ export function ProfileForm({ username: u, avatarUrl: a }: { username: string; a
     return () => clearTimeout(t);
   }, [avatarUrl]);
   const { submit, pending, notice } = useSubmit(
-    () => api("/users/me", { method: "PATCH", body: { username: username.trim(), avatarUrl: avatarUrl.trim() || null } }),
+    async () => {
+      await api("/users/me", { quiet: true, method: "PATCH", body: { username: username.trim(), avatarUrl: avatarUrl.trim() || null } });
+      router.refresh(); // nome e avatar nel menu
+    },
     "Profilo aggiornato",
   );
   return (
@@ -58,7 +63,7 @@ export function PasswordForm() {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const { submit, pending, notice } = useSubmit(async () => {
-    await api("/users/me/password", { method: "PATCH", body: { currentPassword: current, newPassword: next } });
+    await api("/users/me/password", { quiet: true, method: "PATCH", body: { currentPassword: current, newPassword: next } });
     setCurrent("");
     setNext("");
   }, "Password aggiornata");

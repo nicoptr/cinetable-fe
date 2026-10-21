@@ -17,7 +17,7 @@ export function CreateCineforumForm() {
     setPending(true);
     setError(null);
     try {
-      const c = await api<{ id: number }>("/cineforums", { method: "POST", body: { name: name.trim(), description: description.trim() || undefined } });
+      const c = await api<{ id: number }>("/cineforums", { quiet: true, method: "POST", body: { name: name.trim(), description: description.trim() || undefined } });
       router.push(`/cineforums/${c.id}`);
       router.refresh();
     } catch (err) {

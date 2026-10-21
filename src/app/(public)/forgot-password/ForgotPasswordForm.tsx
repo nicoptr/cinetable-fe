@@ -15,7 +15,7 @@ export function ForgotPasswordForm() {
     setPending(true);
     setError(null);
     try {
-      await api("/auth/forgot-password", { method: "POST", body: { email: email.trim() } });
+      await api("/auth/forgot-password", { quiet: true, method: "POST", body: { email: email.trim() } });
       setDone(true);
     } catch (err) {
       setError(err as ApiError);

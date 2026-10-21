@@ -21,7 +21,7 @@ export default async function FilmPage({ params }: { params: Promise<{ id: strin
   return (
     <>
       <Link href={`/cineforums/${id}/seasons/${seasonId}`} className="mb-4 inline-flex min-h-11 items-center text-sm text-muted underline underline-offset-4 hover:text-gold print:hidden">
-        Torna alla rassegna
+        Torna all&apos;edizione
       </Link>
       <header className="mb-8">
         <div className="mx-auto mb-5 w-52">

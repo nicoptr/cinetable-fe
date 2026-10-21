@@ -20,7 +20,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
     if (password !== again) return;
     setPending(true);
     try {
-      await api("/auth/reset-password", { method: "POST", body: { token, password } });
+      await api("/auth/reset-password", { quiet: true, method: "POST", body: { token, password } });
       setDone(true);
     } catch (err) {
       setError(err as ApiError);

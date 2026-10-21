@@ -71,7 +71,7 @@ test("film escluso → messaggio del backend sopra la griglia", async ({ page })
   await switchTo(page, "dario");
   await page.goto(SEASON);
   await pickViaUi(page, "Ghostbusters");
-  await expect(page.locator("main [role=alert]")).toHaveText("Film non disponibile per questa rassegna");
+  await expect(page.locator("main [role=alert]")).toHaveText("Film non disponibile per questa edizione");
 });
 
 test("ricerca con TMDB giù (route → 502) → messaggio 'Servizio film non disponibile, riprova'", async ({ page }) => {
@@ -97,12 +97,12 @@ test("anna (presidente) vede chi manca ma mai i film degli altri", async ({ page
   await expect(page.getByText("Sposta la scadenza")).toBeVisible();
 });
 
-test("anna toglie dalla rassegna chi non ha un film valido", async ({ page }) => {
+test("anna toglie dall'edizione chi non ha un film valido", async ({ page }) => {
   seed("open");
   await loginAs(page, "anna");
   await page.goto(SEASON);
   const row = page.getByRole("listitem").filter({ hasText: "dario" });
-  await row.getByRole("button", { name: "Togli dalla rassegna" }).click();
+  await row.getByRole("button", { name: "Togli dall'edizione" }).click();
   await row.getByRole("button", { name: /Tocca di nuovo/ }).click();
   await expect(page.getByRole("listitem").filter({ hasText: "dario" })).toHaveCount(0);
   await expect(page.getByText("0 film su 3")).toBeVisible();

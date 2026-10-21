@@ -19,7 +19,7 @@ export function LoginForm({ next }: { next: string }) {
     setError(null);
     setResent(false);
     try {
-      await api("/auth/login", { method: "POST", body: { usernameOrEmail: identifier.trim(), password } });
+      await api("/auth/login", { quiet: true, method: "POST", body: { usernameOrEmail: identifier.trim(), password } });
       // ricarica piena: il server deve vedere il cookie appena impostato
       window.location.assign(next);
     } catch (err) {
@@ -31,7 +31,7 @@ export function LoginForm({ next }: { next: string }) {
   async function resend() {
     setResending(true);
     try {
-      await api("/auth/resend-verification", { method: "POST", body: { email: identifier.includes("@") ? identifier.trim() : email.trim() } });
+      await api("/auth/resend-verification", { quiet: true, method: "POST", body: { email: identifier.includes("@") ? identifier.trim() : email.trim() } });
       setResent(true);
     } catch (err) {
       setError(err as ApiError);

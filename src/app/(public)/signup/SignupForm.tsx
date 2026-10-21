@@ -19,11 +19,11 @@ export function SignupForm({ invite }: { invite: { token: string; email: string 
     setPending(true);
     setError(null);
     try {
-      await api("/auth/register", { method: "POST", body: { email: email.trim(), username: username.trim(), password, inviteToken: invite?.token } });
+      await api("/auth/register", { quiet: true, method: "POST", body: { email: email.trim(), username: username.trim(), password, inviteToken: invite?.token } });
       if (invite) {
         // già verificato e con la sessione aperta: si entra nel cineforum dell'invito
         // l'account esiste già: se /auth/me fallisce si va comunque all'elenco, mai di nuovo al form
-        const me = await api<{ memberships: Membership }>("/auth/me").catch(() => null);
+        const me = await api<{ memberships: Membership }>("/auth/me", { quiet: true }).catch(() => null);
         window.location.assign(me?.memberships.length === 1 ? `/cineforums/${me.memberships[0].cineforumId}` : "/cineforums");
         return;
       }
