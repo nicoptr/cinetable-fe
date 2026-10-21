@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { SealMark } from "@/components/Logo";
 import { Notice, useConfirm } from "@/components/ui";
 import { errorText } from "@/lib/api";
 
@@ -43,7 +44,7 @@ export function Envelope({ label, onOpen, disabled = false }: { label: string; o
         <span className="env-label">{opened?.label ?? label}</span>
       </div>
       <div className="env-seal">
-        <span>C</span>
+        <SealMark />
       </div>
       <div className="env-ring" />
       {SPARKS.map((style, i) => (
