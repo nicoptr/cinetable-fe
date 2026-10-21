@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { api, ApiError } from "@/lib/api";
 import type { Me } from "@/lib/types";
+import { Logo, Wordmark } from "./Logo";
 import { Avatar, Notice } from "./ui";
 
 const item = "flex min-h-11 items-center border-t border-line text-left text-base hover:text-gold disabled:opacity-60";
@@ -41,8 +42,9 @@ export function AppHeader({ pending, user }: { pending: number; user: Me | null 
   return (
     <header className="-mt-6 mb-6 border-b border-line print:hidden" onKeyDown={(e) => e.key === "Escape" && open && close()}>
       <div className="flex items-center justify-between">
-        <Link href="/cineforums" className="inline-flex min-h-11 items-center font-serif text-2xl italic text-gold">
-          Cinetable
+        <Link href="/cineforums" className="inline-flex min-h-11 items-center gap-2.5 text-2xl text-gold">
+          <Logo className="drop-shadow-[0_2px_6px_rgb(201_162_74/0.35)]" />
+          <Wordmark />
         </Link>
         <button
           ref={button}
