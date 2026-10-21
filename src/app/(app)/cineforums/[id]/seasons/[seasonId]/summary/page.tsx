@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AwardWinners, formatAverage, formatVotes } from "@/components/AwardWinners";
-import { Avatar, PageTitle, Poster } from "@/components/ui";
+import { Avatar, PageTitle, Poster, Section } from "@/components/ui";
 import { apiServer } from "@/lib/api-server";
 import { formatDate, formatDateTime } from "@/lib/format";
 import type { SeasonSummary } from "@/lib/types";
@@ -27,21 +27,19 @@ export default async function SummaryPage({ params }: { params: Promise<{ id: st
         Conclusa il {formatDate(season.concludedAt)}
       </p>
 
-      <section aria-label="Albo d'oro" className="mb-10">
-        <h2 className="mb-4 font-serif text-2xl">Albo d&apos;oro</h2>
+      <Section aria-label="Albo d'oro" title="Albo d'oro">
         {awards.map((a) => (
-          <section key={a.awardId} aria-label={a.name} className="mb-6 border-b border-line pb-6 text-center break-inside-avoid">
+          <section key={a.awardId} aria-label={a.name} className="border-t border-line py-6 text-center break-inside-avoid first-of-type:border-t-0 first-of-type:pt-0 last:pb-0">
             <h3 className="mb-4 font-serif text-xl text-gold">{a.name}</h3>
             <AwardWinners award={a} />
           </section>
         ))}
-      </section>
+      </Section>
 
-      <section className="mb-10">
-        <h2 className="mb-2 font-serif text-2xl">I film</h2>
+      <Section title="I film">
         <ol aria-label="I film">
           {films.map((f) => (
-            <li key={f.order} className="flex items-start gap-3 border-b border-line py-4 break-inside-avoid">
+            <li key={f.order} className="flex items-start gap-3 border-t border-line py-4 break-inside-avoid first:border-t-0">
               <Poster movie={f.movie} />
               <div className="min-w-0">
                 <p className="text-sm text-muted">Film n. {f.order}</p>
@@ -74,10 +72,9 @@ export default async function SummaryPage({ params }: { params: Promise<{ id: st
             </li>
           ))}
         </ol>
-      </section>
+      </Section>
 
-      <section aria-label="Partecipanti">
-        <h2 className="mb-2 font-serif text-2xl">Partecipanti</h2>
+      <Section aria-label="Partecipanti" title="Partecipanti">
         <ul className="flex flex-wrap gap-x-4 gap-y-2">
           {participants.map((p) => (
             <li key={p.userId} className="flex items-center gap-2">
@@ -86,7 +83,7 @@ export default async function SummaryPage({ params }: { params: Promise<{ id: st
             </li>
           ))}
         </ul>
-      </section>
+      </Section>
     </>
   );
 }

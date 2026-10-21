@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button, ConfirmButton, Field, Notice } from "@/components/ui";
+import { Button, ConfirmButton, Field, Notice, Section } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 import { isoToRomeLocal, romeLocalToIso } from "@/lib/format";
 import type { SeasonView } from "@/lib/types";
@@ -36,8 +36,7 @@ function useAction() {
 export function PlanScreening({ base, screeningAt, location }: { base: string; screeningAt: string | null; location: string | null }) {
   const { busy, error, run } = useAction();
   return (
-    <section className="mb-8">
-      <h2 className="mb-3 font-serif text-xl">Programma la proiezione</h2>
+    <Section title="Programma la proiezione">
       {error && <Notice tone="error">{error}</Notice>}
       <form
         onSubmit={(e) => {
@@ -52,7 +51,7 @@ export function PlanScreening({ base, screeningAt, location }: { base: string; s
           Salva la proiezione
         </Button>
       </form>
-    </section>
+    </Section>
   );
 }
 
@@ -60,7 +59,7 @@ export function Voting({ base, votingOpen, votesMissing }: { base: string; votin
   const { busy, error, run } = useAction();
   const [sent, setSent] = useState<number | null>(null);
   return (
-    <section className="mb-8">
+    <Section>
       {error && <Notice tone="error">{error}</Notice>}
       {!votingOpen ? (
         <ConfirmButton onConfirm={() => run(() => api(`${base}/open-voting`, { quiet: true, method: "POST" }))}>Apri il voto</ConfirmButton>
@@ -82,7 +81,7 @@ export function Voting({ base, votingOpen, votesMissing }: { base: string; votin
           )}
         </>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -96,8 +95,7 @@ export function VoteForm({ base, awards }: { base: string; awards: SeasonView["a
   const touch = (awardId: number, value: number) => setValues((v) => ({ ...v, [awardId]: value }));
   const allTouched = awards.every((a) => values[a.id] !== undefined);
   return (
-    <section>
-      <h2 className="mb-3 font-serif text-xl">Il tuo voto</h2>
+    <Section title="Il tuo voto">
       {error && <Notice tone="error">{error}</Notice>}
       {awards.map((a) => (
         <div key={a.id} className="mb-6">
@@ -135,6 +133,6 @@ export function VoteForm({ base, awards }: { base: string; awards: SeasonView["a
       >
         Invia i voti
       </ConfirmButton>
-    </section>
+    </Section>
   );
 }

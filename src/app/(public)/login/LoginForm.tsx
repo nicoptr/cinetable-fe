@@ -42,7 +42,7 @@ export function LoginForm({ next }: { next: string }) {
 
   const unverified = error?.code === "EMAIL_NOT_VERIFIED";
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} className="card">
       {error && <Notice tone="error">{error.message}</Notice>}
       {resent && <Notice tone="success">L&apos;email di conferma è stata rimandata: controlla la posta.</Notice>}
       {unverified && (

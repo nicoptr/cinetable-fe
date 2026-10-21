@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Avatar, Button, ConfirmButton, Notice } from "@/components/ui";
+import { Avatar, Button, ConfirmButton, Notice, Section } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 import type { SeasonView } from "@/lib/types";
 import { SeasonForm } from "../SeasonForm";
@@ -30,16 +30,23 @@ export function Draft({ cineforumId, season, members, categories, awards }: { ci
   }
 
   if (editing && members && categories && awards) {
-    return <SeasonForm cineforumId={cineforumId} season={season} members={members} categories={categories} awards={awards} onDone={() => setEditing(false)} />;
+    return (
+      <Section>
+        <SeasonForm cineforumId={cineforumId} season={season} members={members} categories={categories} awards={awards} onDone={() => setEditing(false)} />
+      </Section>
+    );
   }
 
   return (
     <>
       {season.description && <p className="mb-4">{season.description}</p>}
-      <Summary title="Categorie" items={season.categories.map((c) => c.name)} />
-      <Summary title="Premi" items={season.awards.map((a) => a.name)} />
-      <section className="mb-4">
-        <h2 className="font-serif text-xl">Partecipanti</h2>
+      <Section title="Categorie">
+        <p className="text-muted">{season.categories.map((c) => c.name).join(", ")}</p>
+      </Section>
+      <Section title="Premi">
+        <p className="text-muted">{season.awards.map((a) => a.name).join(", ")}</p>
+      </Section>
+      <Section title="Partecipanti">
         <ul className="flex flex-wrap gap-x-4">
           {season.participants.map((p) => (
             <li key={p.userId} className="flex min-h-11 items-center gap-2 text-muted">
@@ -48,7 +55,7 @@ export function Draft({ cineforumId, season, members, categories, awards }: { ci
             </li>
           ))}
         </ul>
-      </section>
+      </Section>
       {season.myRole === "PRESIDENT" ? (
         <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
           <ConfirmButton
@@ -99,14 +106,5 @@ export function Draft({ cineforumId, season, members, categories, awards }: { ci
         <p className="mt-6 text-muted">L&apos;edizione sta per iniziare.</p>
       )}
     </>
-  );
-}
-
-function Summary({ title, items }: { title: string; items: string[] }) {
-  return (
-    <section className="mb-4">
-      <h2 className="font-serif text-xl">{title}</h2>
-      <p className="text-muted">{items.join(", ")}</p>
-    </section>
   );
 }

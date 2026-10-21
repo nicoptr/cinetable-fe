@@ -26,7 +26,7 @@ export function ForgotPasswordForm() {
 
   if (done) return <Notice tone="success">Se l&apos;indirizzo è registrato, ti abbiamo scritto.</Notice>;
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} className="card">
       {error && <Notice tone="error">{error.message}</Notice>}
       <Field label="Email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
       <Button type="submit" pending={pending} pendingLabel="Invio…" className="w-full">

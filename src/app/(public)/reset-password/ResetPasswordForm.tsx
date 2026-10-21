@@ -40,7 +40,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
     );
   }
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} className="card">
       {error && <Notice tone="error">{error.message}</Notice>}
       <Field label="Nuova password" type="password" hint="Almeno 8 caratteri" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
       <Field

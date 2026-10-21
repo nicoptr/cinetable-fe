@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { PageTitle } from "@/components/ui";
+import { PageTitle, Section } from "@/components/ui";
 import { apiServer } from "@/lib/api-server";
 import type { Award, Category, CineforumDetail } from "@/lib/types";
 import { SeasonForm } from "../SeasonForm";
@@ -16,7 +16,9 @@ export default async function NewSeasonPage({ params }: { params: Promise<{ id: 
   return (
     <>
       <PageTitle>Nuova edizione</PageTitle>
-      <SeasonForm cineforumId={id} categories={categories} awards={awards} members={c.members} />
+      <Section>
+        <SeasonForm cineforumId={id} categories={categories} awards={awards} members={c.members} />
+      </Section>
     </>
   );
 }

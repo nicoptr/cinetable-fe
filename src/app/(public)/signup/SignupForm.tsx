@@ -46,7 +46,7 @@ export function SignupForm({ invite }: { invite: { token: string; email: string 
   }
 
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} className="card">
       {error && <Notice tone="error">{error.message}</Notice>}
       <Field label="Email" type="email" autoComplete="email" required readOnly={!!invite} value={email} onChange={(e) => setEmail(e.target.value)} />
       <Field

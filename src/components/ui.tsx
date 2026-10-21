@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
+import { useEffect, useId, useRef, useState, type ButtonHTMLAttributes, type ComponentProps, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
 
 type Variant = "primary" | "secondary" | "danger";
 
@@ -136,6 +136,16 @@ export function Notice({ tone = "info", children }: { tone?: keyof typeof TONES;
 
 export function PageTitle({ children }: { children: ReactNode }) {
   return <h1 className="mb-4 font-serif text-3xl leading-tight">{children}</h1>;
+}
+
+/** Card di una sezione (globals.css, `.card`), con il titolo come etichetta. */
+export function Section({ title, children, className = "", ...rest }: Omit<ComponentProps<"section">, "title"> & { title?: ReactNode }) {
+  return (
+    <section className={`card ${className}`} {...rest}>
+      {title && <h2 className="eyebrow mb-2">{title}</h2>}
+      {children}
+    </section>
+  );
 }
 
 const SIZES = { sm: "w-12", md: "w-20", lg: "w-full" };

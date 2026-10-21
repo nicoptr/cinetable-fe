@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Poster } from "@/components/ui";
+import { Poster, Section } from "@/components/ui";
 import { formatDateTime } from "@/lib/format";
 import type { ProgramItem, SeasonView } from "@/lib/types";
 
@@ -13,13 +13,12 @@ function voteState(p: ProgramItem) {
 export function Screening({ base, season }: { base: string; season: SeasonView }) {
   const unrevealed = Array.from({ length: season.remainingToReveal }, (_, i) => season.program.length + i + 1);
   return (
-    <section>
-      <h2 className="mb-2 font-serif text-xl">Programma</h2>
+    <Section title="Programma">
       <ul aria-label="Programma">
         {season.program.map((p) => {
           const state = voteState(p);
           return (
-            <li key={p.order} className="border-b border-line">
+            <li key={p.order} className="border-t border-line first:border-t-0">
               <Link href={`${base}/films/${p.order}`} className="flex min-h-11 items-start gap-3 py-3 hover:text-gold">
                 <Poster movie={p.movie} />
                 <div className="min-w-0">
@@ -36,12 +35,12 @@ export function Screening({ base, season }: { base: string; season: SeasonView }
           );
         })}
         {unrevealed.map((n) => (
-          <li key={n} className="flex items-center gap-3 border-b border-line py-3">
+          <li key={n} className="flex items-center gap-3 border-t border-line py-3 first:border-t-0">
             <Poster movie={null} />
             <p className="text-sm text-muted">Film n. {n}</p>
           </li>
         ))}
       </ul>
-    </section>
+    </Section>
   );
 }

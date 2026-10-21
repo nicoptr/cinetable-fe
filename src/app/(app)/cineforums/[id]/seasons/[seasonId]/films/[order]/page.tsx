@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Poster } from "@/components/ui";
+import { Poster, Section } from "@/components/ui";
 import { apiServer } from "@/lib/api-server";
 import { formatDateTime } from "@/lib/format";
 import type { MyVote, SeasonView } from "@/lib/types";
@@ -46,18 +46,17 @@ export default async function FilmPage({ params }: { params: Promise<{ id: strin
       )}
 
       {item.isMine ? (
-        <p className="border-l-2 border-gold py-1 pl-3">Questo è il tuo film: non puoi votarlo</p>
+        <p className="mt-6 border-l-2 border-gold py-1 pl-3">Questo è il tuo film: non puoi votarlo</p>
       ) : myVotes ? (
-        <section>
-          <h2 className="mb-2 font-serif text-xl">I tuoi voti</h2>
+        <Section title="I tuoi voti">
           <ul>
             {s.awards.map((a) => (
-              <li key={a.id} className="border-b border-line py-2">
+              <li key={a.id} className="border-t border-line py-2 first:border-t-0">
                 {a.name}: {myVotes.find((v) => v.awardId === a.id)?.value ?? "–"}
               </li>
             ))}
           </ul>
-        </section>
+        </Section>
       ) : (
         s.isParticipant && screening && item.votingOpen && <VoteForm base={base} awards={s.awards} />
       )}

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button, Notice } from "@/components/ui";
+import { Button, Notice, Section } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 import { formatDate } from "@/lib/format";
 import type { MyInvitation } from "@/lib/types";
@@ -29,7 +29,7 @@ export function InvitationList({ initial }: { initial: MyInvitation[] }) {
 
   if (list.length === 0) return <p className="text-muted">Nessun invito in attesa.</p>;
   return (
-    <>
+    <Section>
       {error && <Notice tone="error">{error}</Notice>}
       <ul>
         {list.map((i) => (
@@ -49,6 +49,6 @@ export function InvitationList({ initial }: { initial: MyInvitation[] }) {
           </li>
         ))}
       </ul>
-    </>
+    </Section>
   );
 }

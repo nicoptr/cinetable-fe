@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button, ConfirmButton, Field, Notice, Poster } from "@/components/ui";
+import { Button, ConfirmButton, Field, Notice, Poster, Section } from "@/components/ui";
 import { MovieSearch } from "@/components/MovieSearch";
 import { api, errorText } from "@/lib/api";
 import { formatDateTime, isoToRomeLocal, romeLocalToIso } from "@/lib/format";
@@ -47,14 +47,12 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
       {season.isParticipant && mine && (
         <>
           {season.myCategory && (
-            <section className="mb-8 border-l-2 border-gold py-1 pl-4">
-              <h2 className="eyebrow">La tua categoria</h2>
+            <Section title="La tua categoria">
               <p className="font-serif text-2xl text-gold">{season.myCategory.name}</p>
               <p className="text-sm text-muted">Tienila segreta</p>
-            </section>
+            </Section>
           )}
-          <section className="mb-6">
-            <h2 className="mb-2 font-serif text-xl">Il tuo film</h2>
+          <Section title="Il tuo film">
             {mine.status === "NONE" && <p className="mb-4 text-muted">Non hai ancora scelto: cerca il tuo film qui sotto.</p>}
             {mine.status === "DUPLICATE" && <Notice tone="error">Anche un altro partecipante ha scelto questo film: scegline un altro</Notice>}
             {mine.movie && (
@@ -72,19 +70,18 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
               </Button>
             )}
             {showSearch && <MovieSearch candidatureUrl={`${base}/candidature`} onDone={() => { setSearching(false); router.refresh(); }} />}
-          </section>
+          </Section>
         </>
       )}
 
       {progress && (
-        <section className="mb-6">
-          <h2 className="mb-2 font-serif text-xl">Chi manca</h2>
+        <Section title="Chi manca">
           {progress.missing.length === 0 ? (
             <p className="text-muted">Nessuno: tutti hanno un film valido.</p>
           ) : (
             <ul>
               {progress.missing.map((p) => (
-                <li key={p.userId} className="flex items-center justify-between gap-3 border-b border-line py-1">
+                <li key={p.userId} className="flex items-center justify-between gap-3 border-t border-line py-1 first:border-t-0">
                   <span>{p.username}</span>
                   <ConfirmButton variant="danger" disabled={busy} onConfirm={() => run(() => api(`${base}/participants/${p.userId}`, { method: "DELETE" }))}>
                     Togli dall&apos;edizione
@@ -114,7 +111,7 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
             </Button>
           </form>
           {passed && valid === expected && <p className="mt-6 text-muted">Tutti i film sono pronti: apri la busta in cima per svelare il primo.</p>}
-        </section>
+        </Section>
       )}
     </>
   );
