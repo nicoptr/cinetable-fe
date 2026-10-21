@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 
-const TITLE = "Cinofili";
+const TITLE = "Cinetable";
 const DESCRIPTION = "Il cineforum tra amici, con la suspense degli Oscar: candida un film in segreto, scoprilo una sera alla volta, vota e apri la busta.";
 
 export const metadata: Metadata = {
@@ -22,10 +22,10 @@ const STEPS = [
 const linkBase = "inline-flex min-h-11 items-center justify-center";
 
 export default async function Home() {
-  const loggedIn = (await cookies()).has("cinofili_token");
+  const loggedIn = (await cookies()).has("cinetable_token");
   return (
     <>
-      <h1 className="mb-4 font-serif text-4xl leading-tight text-gold italic">Cinofili</h1>
+      <h1 className="mb-4 font-serif text-4xl leading-tight text-gold italic">Cinetable</h1>
       <p className="text-lg text-muted">Il cineforum tra amici, con la suspense degli Oscar</p>
       <ol className="my-8 space-y-5">
         {STEPS.map(([title, text], i) => (

@@ -103,10 +103,10 @@ test("sessione revocata → redirect ad accedi con next", async ({ page, context
 test("la home ha i metadata SEO e le altre pagine sono noindex", async ({ page, request }) => {
   seed("base");
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1, name: "Cinofili" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Cinetable" })).toBeVisible();
   await expect(page.getByText("Il cineforum tra amici, con la suspense degli Oscar")).toBeVisible();
   await expect(page.getByRole("link", { name: "Crea il tuo cineforum" })).toHaveAttribute("href", "/signup");
-  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /Cinofili/);
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /Cinetable/);
   await expect(page.locator('meta[property="og:image"]')).toHaveCount(1);
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
   expect(await page.locator('meta[name="robots"]').count() === 0 || !(await page.locator('meta[name="robots"]').getAttribute("content"))?.includes("noindex")).toBe(true);

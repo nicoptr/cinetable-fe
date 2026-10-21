@@ -5,7 +5,7 @@ import { PUBLIC_PATHS, safeNext } from "@/lib/nav";
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const current = pathname + search;
-  if (!PUBLIC_PATHS.includes(pathname) && !request.cookies.has("cinofili_token")) {
+  if (!PUBLIC_PATHS.includes(pathname) && !request.cookies.has("cinetable_token")) {
     return NextResponse.redirect(new URL("/login?next=" + encodeURIComponent(safeNext(current)), request.url));
   }
   const headers = new Headers(request.headers);

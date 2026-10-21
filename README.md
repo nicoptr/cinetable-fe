@@ -1,6 +1,6 @@
-# Cinofili · frontend
+# Cinetable · frontend
 
-Next.js (App Router) + React 19 + Tailwind v4. Il browser parla solo con `/api/*`, che Next riscrive verso `${BACKEND_URL}/sub/api/*`; la sessione è il cookie httpOnly `cinofili_token` del backend.
+Next.js (App Router) + React 19 + Tailwind v4. Il browser parla solo con `/api/*`, che Next riscrive verso `${BACKEND_URL}/sub/api/*`; la sessione è il cookie httpOnly `cinetable_token` del backend.
 
 ## Avvio
 

@@ -11,7 +11,7 @@ export const metadata = { title: "Accedi" };
 /** Il cookie da solo non basta (può essere scaduto: redirect in loop con apiServer), quindi si chiede al backend. */
 async function hasSession(): Promise<boolean> {
   const jar = await cookies();
-  if (!jar.has("cinofili_token")) return false;
+  if (!jar.has("cinetable_token")) return false;
   try {
     const res = await fetch(`${BACKEND}/sub/api/auth/me`, { headers: { cookie: jar.toString(), ...originHeaders() }, cache: "no-store" });
     return res.ok;

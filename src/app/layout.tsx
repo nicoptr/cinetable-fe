@@ -7,7 +7,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
-  title: { default: "Cinofili", template: "%s · Cinofili" },
+  title: { default: "Cinetable", template: "%s · Cinetable" },
   description: "Il gioco del cineforum: candida un film in segreto, vota, scopri i vincitori alla serata finale.",
   // solo la home è indicizzabile (la sovrascrive in page.tsx)
   robots: { index: false, follow: false },
