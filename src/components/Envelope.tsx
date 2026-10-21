@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Notice, useConfirm } from "@/components/ui";
 import { ApiError } from "@/lib/api";
 
@@ -17,12 +17,17 @@ export function Envelope({ label, onOpen }: { label: string; onOpen: () => Promi
   // l'etichetta resta quella della busta aperta anche se il genitore passa già la prossima
   const [opened, setOpened] = useState<{ label: string; content: ReactNode } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const content = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (opened) content.current?.focus();
+  }, [opened]);
   const { armed, pending, click } = useConfirm(async () => {
     setError(null);
     try {
       setOpened({ label, content: await onOpen() });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Errore imprevisto, riprova");
+      const down = !(err instanceof ApiError) || err.status === 0 || err.status === 429 || err.status >= 500;
+      setError(down ? "Servizio non disponibile, riprova tra poco" : err.message);
     }
   });
 
@@ -53,7 +58,9 @@ export function Envelope({ label, onOpen }: { label: string; onOpen: () => Promi
         {opened ? (
           <>
             <div className="env">{parts}</div>
-            <div className="env-content">{opened.content}</div>
+            <div ref={content} tabIndex={-1} className="env-content outline-none">
+              {opened.content}
+            </div>
           </>
         ) : (
           <button

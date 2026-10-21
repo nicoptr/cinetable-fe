@@ -84,6 +84,8 @@ export function Voting({ base, votingOpen, votesMissing }: { base: string; votin
 
 export function VoteForm({ base, awards }: { base: string; awards: SeasonView["awards"] }) {
   const { error, run } = useAction();
+  // inviati: niente secondo POST mentre router.refresh() porta la vista in sola lettura
+  const [sent, setSent] = useState(false);
   const [values, setValues] = useState<Record<number, number>>(() => Object.fromEntries(awards.map((a) => [a.id, 50])));
   return (
     <section>
@@ -102,6 +104,7 @@ export function VoteForm({ base, awards }: { base: string; awards: SeasonView["a
               min={0}
               max={100}
               value={values[a.id]}
+              disabled={sent}
               onChange={(e) => setValues({ ...values, [a.id]: Number(e.target.value) })}
               className="h-11 flex-1 accent-gold"
             />
@@ -113,7 +116,11 @@ export function VoteForm({ base, awards }: { base: string; awards: SeasonView["a
       ))}
       <p className="mb-3 text-sm text-muted">I voti non si possono modificare</p>
       <ConfirmButton
-        onConfirm={() => run(() => api(`${base}/votes`, { method: "POST", body: { votes: awards.map((a) => ({ awardId: a.id, value: values[a.id] })) } }))}
+        disabled={sent}
+        onConfirm={async () => {
+          const ok = await run(() => api(`${base}/votes`, { method: "POST", body: { votes: awards.map((a) => ({ awardId: a.id, value: values[a.id] })) } }));
+          if (ok) setSent(true);
+        }}
       >
         Invia i voti
       </ConfirmButton>

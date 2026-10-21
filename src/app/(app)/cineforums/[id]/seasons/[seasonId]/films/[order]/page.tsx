@@ -36,7 +36,7 @@ export default async function FilmPage({ params }: { params: Promise<{ id: strin
 
       {s.myRole === "PRESIDENT" && screening && (
         <>
-          {!screened && <PlanScreening base={base} screeningAt={item.screeningAt} location={item.location} />}
+          {!screened && <PlanScreening key={`${item.screeningAt}|${item.location}`} base={base} screeningAt={item.screeningAt} location={item.location} />}
           {screened && <Voting base={base} votingOpen={item.votingOpen} votesMissing={item.votesMissing ?? 0} />}
         </>
       )}

@@ -21,6 +21,11 @@ async function switchTo(page: Page, who: Player) {
   await loginAs(page, who);
 }
 
+/** Il contenuto svelato deve arrivare davvero a opacità 1: un'animazione bloccata a 0 fallisce. */
+async function expectContentVisible(page: Page, timeout = 5000) {
+  await expect.poll(() => page.locator(".env-content").evaluate((e) => getComputedStyle(e).opacity), { timeout }).toBe("1");
+}
+
 const envelope = (page: Page, n: number) => page.getByRole("button", { name: new RegExp(`Film n\\. ${n}`) });
 
 test("anna svela il primo film con la busta e lo vede nel programma", async ({ page }) => {
@@ -35,6 +40,8 @@ test("anna svela il primo film con la busta e lo vede nel programma", async ({ p
   const [first] = await program(page);
   expect(first.order).toBe(1);
   await expect(reveal.getByRole("heading")).toHaveText(first.movie.title);
+  await expectContentVisible(page);
+  await expect(page.locator(".env-content")).toBeFocused();
   const list = page.getByRole("list", { name: "Programma" });
   await expect(list.getByRole("link")).toHaveCount(1);
   await expect(list.getByRole("link")).toContainText(first.movie.title);
@@ -47,11 +54,18 @@ test("doppio tocco sulla busta non svela due film", async ({ page }) => {
   seed("screening");
   await loginAs(page, "anna");
   await page.goto(SEASON);
-  const env = envelope(page, 1);
-  await env.click();
-  await env.click();
-  await env.click({ force: true, timeout: 1000 }).catch(() => {}); // terzo tocco a richiesta in corso
+  let reveals = 0;
+  page.on("request", (r) => {
+    if (r.method() === "POST" && r.url().endsWith("/reveal-next")) reveals++;
+  });
+  await envelope(page, 1).click(); // arma
+  // due tocchi nello stesso tick, prima che React ridisegni: solo il ref `busy` li separa
+  await envelope(page, 1).evaluate((b: HTMLButtonElement) => {
+    b.click();
+    b.click();
+  });
   await expect(page.getByRole("region", { name: "Film n. 1" }).getByRole("heading", { name: TITLES })).toBeVisible();
+  expect(reveals).toBe(1);
   expect(await program(page)).toHaveLength(1);
   await expect(page.getByRole("list", { name: "Programma" }).getByRole("link")).toHaveCount(1);
 });
@@ -132,4 +146,6 @@ test("con prefers-reduced-motion la busta si apre comunque", async ({ page }) =>
   await expect(reveal.getByRole("heading", { name: TITLES })).toBeVisible();
   const [first] = await program(page);
   await expect(reveal.getByRole("heading")).toHaveText(first.movie.title);
+  expect(await page.locator(".env-content").evaluate((e) => getComputedStyle(e).animationDuration)).toBe("0.3s");
+  await expectContentVisible(page, 1000);
 });

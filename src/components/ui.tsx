@@ -143,7 +143,7 @@ export function Poster({ movie, size = "md" }: { movie: { title: string; posterU
   const box = `${SIZES[size]} aspect-[2/3] shrink-0 overflow-hidden rounded border border-line bg-surface`;
   if (!movie) {
     return (
-      <div className={`${box} flex items-center justify-center font-serif text-2xl text-gold`} aria-label="Film da svelare">
+      <div className={`${box} flex items-center justify-center font-serif text-2xl text-gold`} role="img" aria-label="Film da svelare">
         ?
       </div>
     );
