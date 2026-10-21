@@ -1,6 +1,6 @@
 export function Footer() {
   return (
-    <footer className="mt-12 border-t border-line py-6 text-sm text-muted group-has-[[data-landing]]:hidden">
+    <footer className="mt-12 border-t border-line py-6 text-sm text-muted group-has-[[data-landing]]/column:hidden">
       <p>
         Dati dei film forniti da{" "}
         <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer" className="text-gold underline underline-offset-4">

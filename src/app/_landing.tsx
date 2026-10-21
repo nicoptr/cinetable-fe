@@ -32,7 +32,7 @@ export function DemoEnvelope() {
   return (
     <>
       <div className="demo-env" data-open={open || undefined}>
-        <div className="demo-winner">
+        <div id="demo-winner" className="demo-winner">
           {/* eslint-disable-next-line @next/next/no-img-element -- locandina TMDB già dimensionata */}
           <img
             src="https://image.tmdb.org/t/p/w500/wpImvqmdrvJsa3edcUUnr4RCkNU.jpg"
@@ -49,7 +49,7 @@ export function DemoEnvelope() {
           <SealMark />
         </div>
       </div>
-      <Button onClick={() => setOpen(!open)} className="min-h-12 px-6 text-[17px]">
+      <Button onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="demo-winner" className="min-h-12 px-6 text-[17px]">
         {open ? "Richiudi" : "Apri la busta"}
       </Button>
     </>

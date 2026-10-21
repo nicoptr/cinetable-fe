@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="bg-backdrop text-ink antialiased">
         <Spotlight />
         {/* 640px; le pagine con due colonne (data-wide) allargano tutto, header e footer compresi; la landing (data-landing) è a 720px con il suo footer */}
-        <div className="column group mx-auto flex min-h-dvh w-full max-w-[640px] flex-col px-4 has-[[data-landing]]:max-w-[720px] md:has-[[data-wide]]:max-w-[960px]">
+        <div className="column group/column mx-auto flex min-h-dvh w-full max-w-[640px] flex-col px-4 has-[[data-landing]]:max-w-[720px] md:has-[[data-wide]]:max-w-[960px]">
           <main className="flex-1 pt-6">{children}</main>
           <Footer />
         </div>

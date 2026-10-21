@@ -6,7 +6,9 @@ test("da non loggato: titolo, cinque passi e i link per entrare", async ({ page 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Ognuno porta un film\.\s*Nessuno sa di chi è\./);
   await expect(page.locator("#come ol > li")).toHaveCount(5);
   await expect(page.getByRole("heading", { name: "La serata degli Oscar" })).toBeVisible();
-  for (const link of await page.getByRole("link", { name: "Crea il tuo cineforum" }).all()) await expect(link).toHaveAttribute("href", "/signup");
+  const create = page.getByRole("link", { name: "Crea il tuo cineforum" });
+  await expect(create).toHaveCount(2);
+  for (const link of await create.all()) await expect(link).toHaveAttribute("href", "/signup");
   await expect(page.getByRole("link", { name: "Accedi" })).toHaveAttribute("href", "/login");
   await expect(page.getByRole("link", { name: "Ho già un account" })).toHaveAttribute("href", "/login");
   await page.getByRole("link", { name: "Accedi" }).click();
@@ -27,7 +29,9 @@ test("Provala: la busta si apre e si richiude", async ({ page }) => {
   await page.goto("/");
   const winner = page.getByText("Cars - Motori ruggenti", { exact: true });
   await expect(winner).toBeHidden();
+  await expect(page.getByRole("button", { name: "Apri la busta" })).toHaveAttribute("aria-expanded", "false");
   await page.getByRole("button", { name: "Apri la busta" }).click();
+  await expect(page.getByRole("button", { name: "Richiudi" })).toHaveAttribute("aria-expanded", "true");
   await expect(winner).toBeVisible();
   await expect(page.getByText("proposto da Nicola · media 99")).toBeVisible();
   await expect(page.getByRole("img", { name: "Locandina di Cars - Motori ruggenti" })).toBeVisible();

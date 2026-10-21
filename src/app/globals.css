@@ -947,9 +947,6 @@ button.env[data-pending] .env-seal {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mini-env {
-    animation: none;
-  }
   .demo-env,
   .demo-env * {
     transition-delay: 0s !important;
