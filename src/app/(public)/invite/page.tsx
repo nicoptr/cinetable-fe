@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { PageTitle } from "@/components/ui";
-import { BACKEND } from "@/lib/api-server";
+import { BACKEND, originHeaders } from "@/lib/api-server";
 import type { InviteInfo } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Invito", robots: { index: false, follow: false }, referrer: "no-referrer" };
@@ -31,7 +31,7 @@ export default async function InvitePage({ searchParams }: { searchParams: Promi
     const forwardedFor = (await headers()).get("x-forwarded-for");
     res = await fetch(`${BACKEND}/sub/api/invitations/token/${encodeURIComponent(token)}`, {
       cache: "no-store",
-      headers: forwardedFor ? { "x-forwarded-for": forwardedFor } : undefined,
+      headers: { ...originHeaders(), ...(forwardedFor && { "x-forwarded-for": forwardedFor }) },
     });
   } catch {
     return <Message title="Servizio non disponibile, riprova tra poco" text="Non siamo riusciti a controllare l'invito." />;

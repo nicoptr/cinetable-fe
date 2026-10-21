@@ -1,6 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 import base, { backendServer } from "./playwright.config";
 
+/** Il backend e2e non lo controlla: serve solo a verificare che non finisca nel bundle del client. */
+export const E2E_ORIGIN_SECRET = "e2e-origin-secret-mai-nel-bundle-0123456789";
+
 // Smoke contro la build di production (`next build && next start`, porta 3056) e lo stesso backend e2e (5055).
 export default defineConfig({
   ...base,
@@ -12,7 +15,7 @@ export default defineConfig({
     {
       command: "npx next build && npx next start -p 3056",
       url: "http://localhost:3056",
-      env: { BACKEND_URL: "http://localhost:5055", NEXT_PUBLIC_SITE_URL: "http://localhost:3056" },
+      env: { BACKEND_URL: "http://localhost:5055", NEXT_PUBLIC_SITE_URL: "http://localhost:3056", ORIGIN_SECRET: E2E_ORIGIN_SECRET },
       reuseExistingServer: false,
       timeout: 300_000,
     },

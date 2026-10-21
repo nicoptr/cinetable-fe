@@ -1,3 +1,6 @@
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { E2E_ORIGIN_SECRET } from "../playwright.prod.config";
 import { expect, loginAs, seed, test } from "../e2e/helpers";
 
 test("home con gli header di sicurezza", async ({ page }) => {
@@ -36,4 +39,11 @@ test("login, poi /login con la sessione porta a next (solo interno)", async ({ p
   await expect(page).toHaveURL(/localhost:3056\/cineforums$/);
   await page.goto("/login?next=%2F.%2F%2Fevil.com");
   await expect(page).toHaveURL(/localhost:3056\/cineforums$/);
+});
+
+test("ORIGIN_SECRET resta lato server: non compare nei file statici del client", async () => {
+  const dir = path.resolve(__dirname, "../.next/static");
+  const files = readdirSync(dir, { recursive: true, withFileTypes: true }).filter((f) => f.isFile());
+  expect(files.length).toBeGreaterThan(0);
+  for (const f of files) expect(readFileSync(path.join(f.parentPath, f.name), "utf8"), f.name).not.toContain(E2E_ORIGIN_SECRET);
 });

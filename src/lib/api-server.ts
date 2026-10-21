@@ -4,10 +4,14 @@ import { safeNext } from "./nav";
 
 export const BACKEND = process.env.BACKEND_URL ?? "http://localhost:5000";
 
+/** Il segreto che il backend esige quando è dietro Vercel. Solo lato server: mai una variabile `NEXT_PUBLIC_`. */
+export const originHeaders = (): Record<string, string> =>
+  process.env.ORIGIN_SECRET ? { "x-origin-secret": process.env.ORIGIN_SECRET } : {};
+
 /** Server: chiama il backend inoltrando il cookie della richiesta, mai in cache. */
 export async function apiServer<T>(path: string): Promise<T> {
   const res = await fetch(`${BACKEND}/sub/api${path}`, {
-    headers: { cookie: (await cookies()).toString() },
+    headers: { cookie: (await cookies()).toString(), ...originHeaders() },
     cache: "no-store",
   });
   if (res.status === 401) {
