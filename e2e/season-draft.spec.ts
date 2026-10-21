@@ -11,7 +11,7 @@ async function fillDraft(page: Page, name: string) {
   for (const l of ["Horror anni '80", "Commedia italiana", "Miglior film", "Miglior regia"]) await page.getByLabel(l).check();
 }
 
-test("creo una bozza con due categorie e due premi e la avvio", async ({ page }) => {
+test("creo una bozza con due categorie e due award e la avvio", async ({ page }) => {
   seed("base");
   await loginAs(page, "anna");
   await fillDraft(page, "Autunno");

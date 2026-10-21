@@ -143,9 +143,9 @@ test("la scheda mostra albo d'oro, film in ordine con medie, nessun voto singolo
     await expect(row.getByText(/^Miglior film/)).toContainText(`media ${f.film} · 3 voti`);
     await expect(row.getByText(/^Miglior regia/)).toContainText(`media ${f.direction} · 3 voti`);
   }
-  await expect(films.nth(2).getByLabel("Premio vinto")).toHaveCount(1);
-  await expect(films.nth(0).getByLabel("Premio vinto")).toHaveCount(1);
-  await expect(films.nth(1).getByLabel("Premio vinto")).toHaveCount(0);
+  await expect(films.nth(2).getByLabel("Award vinto")).toHaveCount(1);
+  await expect(films.nth(0).getByLabel("Award vinto")).toHaveCount(1);
+  await expect(films.nth(1).getByLabel("Award vinto")).toHaveCount(0);
   // nessun voto singolo (es. 95 di dario a Fight Club, di bruno alla regia de La cosa)
   await expect(page.getByRole("list", { name: "I film" })).not.toContainText(/\b(95|85|40)\b/);
 

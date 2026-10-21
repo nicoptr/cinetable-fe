@@ -43,7 +43,7 @@ export function Draft({ cineforumId, season, members, categories, awards }: { ci
       <Section title="Categorie">
         <p className="text-muted">{season.categories.map((c) => c.name).join(", ")}</p>
       </Section>
-      <Section title="Premi">
+      <Section title="Award">
         <p className="text-muted">{season.awards.map((a) => a.name).join(", ")}</p>
       </Section>
       <Section title="Partecipanti">

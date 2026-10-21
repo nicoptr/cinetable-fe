@@ -5,14 +5,14 @@ const SECTIONS = [
   { name: "Edizioni", path: "/cineforums/1" },
   { name: "Membri", path: "/cineforums/1/members" },
   { name: "Categorie", path: "/cineforums/1/categories" },
-  { name: "Premi", path: "/cineforums/1/awards" },
+  { name: "Award", path: "/cineforums/1/awards" },
 ];
 
 async function expectNoEditing(page: Page) {
   for (const name of [/Nuov[ao]/, /Modifica/, /Elimina/]) await expect(page.getByRole("button", { name })).toHaveCount(0);
 }
 
-test("membro: Categorie e Premi in sola lettura", async ({ page }) => {
+test("membro: Categorie e Award in sola lettura", async ({ page }) => {
   seed("base");
   await loginAs(page, "bruno");
   await page.goto("/cineforums/1/categories");
@@ -21,12 +21,12 @@ test("membro: Categorie e Premi in sola lettura", async ({ page }) => {
   await expect(page.getByRole("listitem").filter({ hasText: "Commedia italiana" })).toBeVisible();
   await expectNoEditing(page);
   await page.goto("/cineforums/1/awards");
-  await expect(page.getByRole("heading", { name: "Premi · 2" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Award · 2" })).toBeVisible();
   await expect(page.getByRole("listitem").filter({ hasText: "Miglior regia" })).toBeVisible();
   await expectNoEditing(page);
 });
 
-test("presidente: Categorie e Premi modificabili", async ({ page }) => {
+test("presidente: Categorie e Award modificabili", async ({ page }) => {
   seed("base");
   await loginAs(page, "anna");
   await page.goto("/cineforums/1/categories");
@@ -34,7 +34,7 @@ test("presidente: Categorie e Premi modificabili", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Modifica Horror anni '80" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Elimina Horror anni '80" })).toBeVisible();
   await page.goto("/cineforums/1/awards");
-  await expect(page.getByRole("button", { name: "+ Nuovo premio" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "+ Nuovo award" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Modifica Miglior film" })).toBeVisible();
 });
 
@@ -79,7 +79,7 @@ test("Edizioni senza edizioni: nessuna card, solo il messaggio", async ({ page }
   await expect(page.getByRole("link", { name: "+ Nuova edizione" })).toBeVisible();
 });
 
-test("membro di un cineforum senza categorie né premi: solo i messaggi, nessuna card", async ({ page }) => {
+test("membro di un cineforum senza categorie né award: solo i messaggi, nessuna card", async ({ page }) => {
   seed("base");
   await loginAs(page, "carla");
   await page.goto("/invitations");
@@ -89,7 +89,7 @@ test("membro di un cineforum senza categorie né premi: solo i messaggi, nessuna
   await expect(page.getByText("Nessuna categoria.")).toBeVisible();
   await expect(page.locator("main .card")).toHaveCount(0);
   await page.goto("/cineforums/2/awards");
-  await expect(page.getByText("Nessun premio.")).toBeVisible();
+  await expect(page.getByText("Nessun award.")).toBeVisible();
   await expect(page.locator("main .card")).toHaveCount(0);
 });
 

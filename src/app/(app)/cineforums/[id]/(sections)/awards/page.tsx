@@ -11,18 +11,18 @@ export default async function AwardsPage({ params }: { params: Promise<{ id: str
   const [c, awards] = await Promise.all([apiServer<CineforumDetail>(`/cineforums/${id}`), apiServer<Award[]>(path)]);
   const items = awards.map((x) => ({ id: x.id, name: x.name, extra: x.question }));
   const president = c.myRole === "PRESIDENT";
-  if (!president && items.length === 0) return <p className="text-muted">Nessun premio.</p>;
+  if (!president && items.length === 0) return <p className="text-muted">Nessun award.</p>;
   return (
-    <Section title={`Premi · ${items.length}`}>
+    <Section title={`Award · ${items.length}`}>
       {president ? (
         <ItemEditor
           path={path}
           items={items}
-          nameLabel="Nome del premio"
+          nameLabel="Nome dell'award"
           extraLabel="Domanda di voto"
           extraKey="question"
-          newLabel="Nuovo premio"
-          addedLabel="Premio aggiunto"
+          newLabel="Nuovo award"
+          addedLabel="Award aggiunto"
         />
       ) : (
         <ItemList items={items} />

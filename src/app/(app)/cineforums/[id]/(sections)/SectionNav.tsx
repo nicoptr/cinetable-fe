@@ -7,7 +7,7 @@ const SECTIONS = [
   { path: "", label: "Edizioni" },
   { path: "/members", label: "Membri" },
   { path: "/categories", label: "Categorie" },
-  { path: "/awards", label: "Premi" },
+  { path: "/awards", label: "Award" },
 ];
 
 export function SectionNav({ id }: { id: string }) {

@@ -6,7 +6,7 @@ const oneDecimal = new Intl.NumberFormat("it-IT", { minimumFractionDigits: 1, ma
 export const formatAverage = (n: number) => oneDecimal.format(n);
 export const formatVotes = (n: number) => (n === 1 ? "1 voto" : `${n} voti`);
 
-/** Vincitori di un premio: locandine affiancate se ex aequo. `envelope` aggiunge le classi dell'animazione della busta. */
+/** Vincitori di un award: locandine affiancate se ex aequo. `envelope` aggiunge le classi dell'animazione della busta. */
 export function AwardWinners({ award, envelope = false }: { award: AwardResult; envelope?: boolean }) {
   const { winners } = award;
   if (!winners.length) return <p className="text-muted">Nessun vincitore: nessun voto</p>;

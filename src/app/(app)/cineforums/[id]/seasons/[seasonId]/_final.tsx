@@ -9,7 +9,7 @@ import { api } from "@/lib/api";
 import type { AwardResult, SeasonResults, SeasonView } from "@/lib/types";
 
 /**
- * Serata finale: le buste dei premi (solo presidente) e i risultati già aperti.
+ * Serata finale: le buste degli award (solo presidente) e i risultati già aperti.
  * Sta nello stesso punto dell'albero in SCREENING, FINAL e DONE: dopo `router.refresh()`
  * la busta appena aperta resta montata e aperta, e non si ripete tra i risultati.
  * Una busta alla volta: mentre una si apre (risposta e animazione) le altre sono disabilitate.

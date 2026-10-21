@@ -29,21 +29,21 @@ test("membro non vede Nuova edizione né il form inviti; settings non esiste pi�
   await expect(page.getByRole("heading", { name: "Non trovato" })).toBeVisible();
 });
 
-test("aggiungo un premio con la sua domanda", async ({ page }) => {
+test("aggiungo un award con la sua domanda", async ({ page }) => {
   seed("base");
   await loginAs(page, "anna");
   await page.goto("/cineforums/1");
-  await page.getByRole("link", { name: "Premi", exact: true }).click();
+  await page.getByRole("link", { name: "Award", exact: true }).click();
   await expect(page).toHaveURL(/\/cineforums\/1\/awards$/);
   await expect(page.getByText("Miglior regia")).toBeVisible();
-  await expect(page.getByLabel("Nome del premio")).toHaveCount(0);
-  await page.getByRole("button", { name: "+ Nuovo premio" }).click();
-  await expect(page.getByRole("heading", { name: "Nuovo premio" })).toBeVisible();
-  await page.getByLabel("Nome del premio").fill("Miglior colonna sonora");
+  await expect(page.getByLabel("Nome dell'award")).toHaveCount(0);
+  await page.getByRole("button", { name: "+ Nuovo award" }).click();
+  await expect(page.getByRole("heading", { name: "Nuovo award" })).toBeVisible();
+  await page.getByLabel("Nome dell'award").fill("Miglior colonna sonora");
   await page.getByLabel("Domanda di voto").fill("Quanto ti è piaciuta la musica?");
   await page.getByRole("button", { name: "Salva" }).click();
-  await expect(page.getByText("Premio aggiunto")).toBeVisible();
-  await expect(page.getByLabel("Nome del premio")).toHaveCount(0);
+  await expect(page.getByText("Award aggiunto")).toBeVisible();
+  await expect(page.getByLabel("Nome dell'award")).toHaveCount(0);
   await expect(page.getByRole("listitem").filter({ hasText: "Miglior colonna sonora" })).toContainText("Quanto ti è piaciuta la musica?");
   await expectNoHorizontalScroll(page);
 });
@@ -72,10 +72,10 @@ test("modifica in linea con Salva e Annulla", async ({ page }) => {
   await loginAs(page, "anna");
   await page.goto("/cineforums/1/awards");
   await page.getByRole("button", { name: "Modifica Miglior regia" }).click();
-  await page.getByLabel("Nome del premio").fill("Miglior regista");
+  await page.getByLabel("Nome dell'award").fill("Miglior regista");
   await page.getByRole("button", { name: "Salva" }).click();
   await expect(page.getByRole("listitem").filter({ hasText: "Miglior regista" })).toBeVisible();
-  await expect(page.getByLabel("Nome del premio")).toHaveCount(0);
+  await expect(page.getByLabel("Nome dell'award")).toHaveCount(0);
 });
 
 test("cineforum di cui non faccio parte → pagina Non trovato", async ({ page }) => {

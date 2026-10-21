@@ -69,7 +69,7 @@ export default async function SummaryPage({ params }: { params: Promise<{ id: st
                       {awardName.get(sc.awardId)}:{" "}
                       {sc.average === null ? "nessun voto" : `media ${formatAverage(sc.average)} · ${formatVotes(sc.votes)}`}
                       {f.awardsWon.includes(sc.awardId) && (
-                        <span role="img" aria-label="Premio vinto" className="ml-1 text-gold">
+                        <span role="img" aria-label="Award vinto" className="ml-1 text-gold">
                           ★
                         </span>
                       )}
