@@ -6,6 +6,7 @@ import { candidaturesClosed, formatDateTime } from "@/lib/format";
 import type { Award, Category, CandidatureProgress, CineforumDetail, MyCandidature, SeasonResults, SeasonView } from "@/lib/types";
 import { Draft } from "./_draft";
 import { FinalNight } from "./_final";
+import { NextScreening } from "./_next";
 import { Open } from "./_open";
 import { RevealNext } from "./_reveal";
 import { Screening } from "./_screening";
@@ -56,6 +57,7 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
       )}
       {/* stesso punto dell'albero in OPEN e SCREENING: la busta aperta sopravvive al cambio di stato */}
       {president && (s.status === "OPEN" || s.status === "SCREENING") && <RevealNext base={base} next={s.program.length + 1} available={canReveal} />}
+      <NextScreening base={president && canReveal ? base : undefined} next={s.nextScreening} />
       {s.status === "DONE" && (
         <div className="mb-8 border-y border-gold py-4 text-center">
           <p className="font-serif text-2xl text-gold">Edizione conclusa</p>

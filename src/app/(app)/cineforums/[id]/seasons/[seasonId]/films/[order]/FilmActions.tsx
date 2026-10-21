@@ -1,68 +1,65 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Button, ConfirmButton, Field, Notice, Section } from "@/components/ui";
-import { api, ApiError } from "@/lib/api";
-import { isoToRomeLocal, romeLocalToIso } from "@/lib/format";
+import { useEffect, useState } from "react";
+import { ScreeningForm } from "@/components/ScreeningForm";
+import { Button, ConfirmButton, Notice, Section } from "@/components/ui";
+import { api } from "@/lib/api";
+import { formatLongDateTime } from "@/lib/format";
 import type { SeasonView } from "@/lib/types";
+import { useAction } from "@/lib/useAction";
 
-/** Esegue una mutazione: errore del backend così com'è, poi refresh dei dati del server. */
-function useAction() {
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  /** true se è andata a buon fine (anche con 204 e corpo vuoto). */
-  async function run(fn: () => Promise<unknown>) {
-    setBusy(true);
-    setError(null);
-    try {
-      await fn();
-      router.refresh();
-      return true;
-    } catch (err) {
-      const { status, message } = err as ApiError;
-      setError(message);
-      // 4xx (es. 409 voto già inviato o voto chiuso): il form è vecchio, la vista del server no
-      if (status >= 400 && status < 500 && status !== 429) router.refresh();
-      return false;
-    } finally {
-      setBusy(false);
-    }
-  }
-  return { busy, error, run };
-}
+/** Oltre questo ritardo setTimeout scatta subito: per date così lontane il timer non serve. */
+const MAX_TIMEOUT = 2 ** 31 - 1;
 
 export function PlanScreening({ base, screeningAt, location }: { base: string; screeningAt: string | null; location: string | null }) {
   const { busy, error, run } = useAction();
   return (
     <Section title="Programma la proiezione">
-      {error && <Notice tone="error">{error}</Notice>}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const f = new FormData(e.currentTarget);
-          void run(() => api(`${base}/screening`, { quiet: true, method: "PATCH", body: { screeningAt: romeLocalToIso(String(f.get("at"))), location: f.get("location") } }));
-        }}
-      >
-        <Field label="Data e ora" name="at" type="datetime-local" defaultValue={screeningAt ? isoToRomeLocal(screeningAt) : ""} required />
-        <Field label="Luogo" name="location" defaultValue={location ?? ""} maxLength={200} required />
-        <Button type="submit" pending={busy} pendingLabel="Salvataggio…" className="w-full">
-          Salva la proiezione
-        </Button>
-      </form>
+      <ScreeningForm
+        screeningAt={screeningAt}
+        location={location}
+        busy={busy}
+        error={error}
+        submitLabel="Salva la proiezione"
+        onSubmit={(body) => void run(() => api(`${base}/screening`, { quiet: true, method: "PATCH", body }))}
+      />
     </Section>
   );
 }
 
-export function Voting({ base, votingOpen, votesMissing }: { base: string; votingOpen: boolean; votesMissing: number }) {
+/** true dall'orario della proiezione in poi; un timer lo fa scattare da solo, poi aggiorna la vista del server. */
+function useScreened(screeningAt: string | null) {
+  const router = useRouter();
+  const [screened, setScreened] = useState(() => screeningAt != null && Date.parse(screeningAt) <= Date.now());
+  useEffect(() => {
+    if (!screeningAt || screened) return;
+    const wait = Date.parse(screeningAt) - Date.now();
+    if (wait > MAX_TIMEOUT) return;
+    const timer = setTimeout(() => {
+      setScreened(true);
+      router.refresh();
+    }, Math.max(0, wait));
+    return () => clearTimeout(timer);
+  }, [screeningAt, screened, router]);
+  return screened;
+}
+
+export function Voting({ base, screeningAt, votingOpen, votesMissing }: { base: string; screeningAt: string | null; votingOpen: boolean; votesMissing: number }) {
   const { busy, error, run } = useAction();
   const [sent, setSent] = useState<number | null>(null);
+  const screened = useScreened(screeningAt);
   return (
     <Section>
       {error && <Notice tone="error">{error}</Notice>}
       {!votingOpen ? (
-        <ConfirmButton onConfirm={() => run(() => api(`${base}/open-voting`, { quiet: true, method: "POST" }))}>Apri il voto</ConfirmButton>
+        !screeningAt ? (
+          <p className="text-muted">Fissa prima la proiezione</p>
+        ) : !screened ? (
+          <p className="text-muted">Potrai aprire il voto dopo la proiezione del {formatLongDateTime(screeningAt)}</p>
+        ) : (
+          <ConfirmButton onConfirm={() => run(() => api(`${base}/open-voting`, { quiet: true, method: "POST" }))}>Apri il voto</ConfirmButton>
+        )
       ) : (
         <>
           <p className="mb-2">{votesMissing === 0 ? "Hanno votato tutti" : votesMissing === 1 ? "Manca 1 voto" : `Mancano ${votesMissing} voti`}</p>

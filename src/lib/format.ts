@@ -14,11 +14,17 @@ const dateTime = new Intl.DateTimeFormat("it-IT", {
   minute: "2-digit",
 });
 
+const longDate = new Intl.DateTimeFormat("it-IT", { timeZone: "Europe/Rome", weekday: "long", day: "numeric", month: "long" });
+const time = new Intl.DateTimeFormat("it-IT", { timeZone: "Europe/Rome", hour: "2-digit", minute: "2-digit" });
+
 /** "ven 14 nov 2026" */
 export const formatDate = (iso: string) => date.format(new Date(iso));
 
 /** "ven 14 nov, 21:00" */
 export const formatDateTime = (iso: string) => dateTime.format(new Date(iso));
+
+/** "venerdì 15 marzo alle 20:30" */
+export const formatLongDateTime = (iso: string) => `${longDate.format(new Date(iso))} alle ${time.format(new Date(iso))}`;
 
 const romeParts = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Europe/Rome",

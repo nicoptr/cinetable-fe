@@ -74,7 +74,8 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
         </>
       )}
 
-      {progress && (
+      {/* a gioco iniziato (candidature chiuse e tutti i film validi) non manca più nessuno */}
+      {progress && !(passed && valid === expected) && (
         <Section title="Chi manca">
           {progress.missing.length === 0 ? (
             <p className="text-muted">Nessuno: tutti hanno un film valido.</p>
@@ -110,7 +111,6 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
               Salva scadenza
             </Button>
           </form>
-          {passed && valid === expected && <p className="mt-6 text-muted">Tutti i film sono pronti: apri la busta in cima per svelare il primo.</p>}
         </Section>
       )}
     </>

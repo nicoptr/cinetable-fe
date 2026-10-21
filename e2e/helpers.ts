@@ -21,7 +21,7 @@ export const INVITE_TOKEN_CARLA = "e2e000000000000000000000000000000000000000000
 export const VERIFY_TOKEN = "e2e0000000000000000000000000000000000000000000000000000000000003"; // nuovo@e2e.it
 export const PASSWORD = "password-e2e";
 
-export type Scenario = "base" | "open" | "screening" | "final" | "done";
+export type Scenario = "base" | "open" | "late" | "screening" | "final" | "done";
 export type Player = "anna" | "bruno" | "carla" | "dario";
 
 /** Svuota il DB e2e e lo ricrea nello scenario dato (id e ordine sempre uguali). */
