@@ -156,3 +156,45 @@ export function Poster({ movie, size = "md" }: { movie: { title: string; posterU
   // eslint-disable-next-line @next/next/no-img-element -- niente next/image: locandine TMDB già dimensionate
   return <img src={movie.posterUrl} alt={movie.title} loading="lazy" className={`${box} object-cover`} />;
 }
+
+const initials = (name: string) =>
+  name
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+
+/**
+ * Foto tonda, oppure le iniziali su un cerchio con bordo oro (anche se la foto non si carica).
+ * Decorativa (`alt` vuoto): si usa solo accanto al nome già scritto.
+ */
+export function Avatar({ name, url, size = 24 }: { name: string; url: string | null; size?: number }) {
+  const [broken, setBroken] = useState<string | null>(null);
+  const box = { width: size, height: size, fontSize: Math.round(size * 0.45) };
+  if (url && broken !== url) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- URL esterno arbitrario scelto dall'utente
+      <img
+        src={url}
+        alt=""
+        style={box}
+        // un errore arrivato prima dell'idratazione non passa da onError: lo si legge dall'immagine
+        ref={(img) => {
+          if (img?.complete && img.naturalWidth === 0) setBroken(url);
+        }}
+        onError={() => setBroken(url)}
+        className="inline-block shrink-0 rounded-full border border-line object-cover"
+      />
+    );
+  }
+  return (
+    // iniziali da CSS: decorative, fuori dal testo della pagina ("proposto da carla" resta tale)
+    <span
+      aria-hidden="true"
+      data-initials={initials(name)}
+      style={box}
+      className="inline-flex shrink-0 items-center justify-center rounded-full border border-gold/60 font-serif leading-none text-gold before:content-[attr(data-initials)]"
+    />
+  );
+}

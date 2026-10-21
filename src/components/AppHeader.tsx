@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { api, ApiError } from "@/lib/api";
-import { Notice } from "./ui";
+import type { Me } from "@/lib/types";
+import { Avatar, Notice } from "./ui";
 
 const item = "flex min-h-11 items-center border-t border-line text-left text-base hover:text-gold disabled:opacity-60";
 
-export function AppHeader({ pending }: { pending: number }) {
+export function AppHeader({ pending, user }: { pending: number; user: Me | null }) {
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +28,7 @@ export function AppHeader({ pending }: { pending: number }) {
     setLoggingOut(true);
     setError(null);
     try {
-      await api("/auth/logout", { method: "POST" });
+      await api("/auth/logout", { quiet: true, method: "POST" });
       // ricarica piena: la sessione è finita, niente stato da tenere
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.assign("/");
@@ -49,9 +50,10 @@ export function AppHeader({ pending }: { pending: number }) {
           aria-expanded={open}
           aria-controls={open ? "app-menu" : undefined}
           onClick={() => (open ? close() : setOpen(true))}
-          className="inline-flex min-h-11 min-w-11 items-center justify-end rounded hover:text-gold"
+          className="inline-flex min-h-11 min-w-11 items-center justify-end gap-2 rounded hover:text-gold"
         >
           <span className="sr-only">Menu</span>
+          {user && <Avatar name={user.username} url={user.avatarUrl} size={28} />}
           <span aria-hidden className="text-2xl leading-none">{open ? "✕" : "☰"}</span>
         </button>
       </div>

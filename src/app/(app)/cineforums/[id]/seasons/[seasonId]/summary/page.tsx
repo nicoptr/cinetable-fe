@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AwardWinners, formatAverage, formatVotes } from "@/components/AwardWinners";
-import { PageTitle, Poster } from "@/components/ui";
+import { Avatar, PageTitle, Poster } from "@/components/ui";
 import { apiServer } from "@/lib/api-server";
 import { formatDate, formatDateTime } from "@/lib/format";
 import type { SeasonSummary } from "@/lib/types";
@@ -16,7 +16,7 @@ export default async function SummaryPage({ params }: { params: Promise<{ id: st
   return (
     <>
       <Link href={base} className="mb-4 inline-flex min-h-11 items-center text-sm text-muted underline underline-offset-4 hover:text-gold print:hidden">
-        Torna alla rassegna
+        Torna all&apos;edizione
       </Link>
       <PageTitle>{season.name}</PageTitle>
       {season.description && <p className="mb-2">{season.description}</p>}
@@ -47,8 +47,9 @@ export default async function SummaryPage({ params }: { params: Promise<{ id: st
                 <p className="text-sm text-muted">Film n. {f.order}</p>
                 <h3 className="font-serif text-lg leading-snug">{f.movie.title}</h3>
                 {f.category && <p className="text-sm text-muted">{f.category.name}</p>}
-                <p className="text-sm">
-                  proposto da <strong>{f.proposer.username}</strong>
+                <p className="flex items-center gap-1.5 text-sm">
+                  proposto da <Avatar name={f.proposer.username} url={f.proposer.avatarUrl} size={20} />
+                  <strong>{f.proposer.username}</strong>
                 </p>
                 {f.screeningAt && (
                   <p className="text-sm text-muted">
@@ -77,9 +78,12 @@ export default async function SummaryPage({ params }: { params: Promise<{ id: st
 
       <section aria-label="Partecipanti">
         <h2 className="mb-2 font-serif text-2xl">Partecipanti</h2>
-        <ul className="flex flex-wrap gap-x-4 gap-y-1">
+        <ul className="flex flex-wrap gap-x-4 gap-y-2">
           {participants.map((p) => (
-            <li key={p.userId}>{p.username}</li>
+            <li key={p.userId} className="flex items-center gap-2">
+              <Avatar name={p.username} url={p.avatarUrl} />
+              {p.username}
+            </li>
           ))}
         </ul>
       </section>

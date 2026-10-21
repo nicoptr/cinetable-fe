@@ -1,4 +1,4 @@
-import { Poster } from "@/components/ui";
+import { Avatar, Poster } from "@/components/ui";
 import type { AwardResult } from "@/lib/types";
 
 const oneDecimal = new Intl.NumberFormat("it-IT", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -21,7 +21,11 @@ export function AwardWinners({ award, envelope = false }: { award: AwardResult; 
             </div>
             <h4 className={`mt-3 font-serif text-2xl leading-tight text-ink ${envelope ? "envelope-title" : ""}`}>{w.movie.title}</h4>
             <p className={`text-sm text-muted ${envelope ? "envelope-caption" : ""}`}>
-              proposto da <strong className="text-ink">{w.proposer.username}</strong>
+              proposto da{" "}
+              <span className="inline-flex items-center gap-1.5 align-middle">
+                <Avatar name={w.proposer.username} url={w.proposer.avatarUrl} size={20} />
+                <strong className="text-ink">{w.proposer.username}</strong>
+              </span>
               <br />
               media <span className="text-gold">{formatAverage(w.average)}</span> · {formatVotes(w.votes)}
             </p>

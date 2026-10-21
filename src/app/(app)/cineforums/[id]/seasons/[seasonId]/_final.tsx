@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AwardWinners } from "@/components/AwardWinners";
 import { Envelope, ENVELOPE_ANIMATION_MS } from "@/components/Envelope";
-import { Poster } from "@/components/ui";
+import { Avatar, Poster } from "@/components/ui";
 import { api } from "@/lib/api";
 import type { AwardResult, SeasonResults, SeasonView } from "@/lib/types";
 
@@ -46,7 +46,7 @@ export function FinalNight({
                 setOpening(a.id);
                 let result: AwardResult;
                 try {
-                  result = await api<AwardResult>(`${base}/awards/${a.id}/open`, { method: "POST" });
+                  result = await api<AwardResult>(`${base}/awards/${a.id}/open`, { quiet: true, method: "POST" });
                 } catch (err) {
                   setOpening(null);
                   router.refresh();
@@ -87,8 +87,9 @@ export function FinalNight({
                 <Poster movie={p.movie} size="sm" />
                 <div className="min-w-0">
                   <p className="font-serif leading-snug">{p.movie.title}</p>
-                  <p className="text-sm text-muted">
-                    proposto da <strong className="text-ink">{p.proposer.username}</strong>
+                  <p className="flex items-center gap-1.5 text-sm text-muted">
+                    proposto da <Avatar name={p.proposer.username} url={p.proposer.avatarUrl} size={20} />
+                    <strong className="text-ink">{p.proposer.username}</strong>
                   </p>
                 </div>
               </li>

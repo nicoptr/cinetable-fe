@@ -3,7 +3,7 @@ import { unstable_rethrow } from "next/navigation";
 import type { ReactNode } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { apiServer } from "@/lib/api-server";
-import type { MyInvitation } from "@/lib/types";
+import type { Me, MyInvitation } from "@/lib/types";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -17,11 +17,21 @@ async function pendingInvites(): Promise<number> {
   }
 }
 
+/** Best effort come sopra: senza utente il menu mostra solo l'icona. */
+async function me(): Promise<Me | null> {
+  try {
+    return await apiServer<Me>("/auth/me");
+  } catch (e) {
+    unstable_rethrow(e);
+    return null;
+  }
+}
+
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  const pending = await pendingInvites();
+  const [pending, user] = await Promise.all([pendingInvites(), me()]);
   return (
     <>
-      <AppHeader pending={pending} />
+      <AppHeader pending={pending} user={user} />
       {children}
     </>
   );
