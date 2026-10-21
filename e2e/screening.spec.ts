@@ -2,6 +2,9 @@ import type { Page } from "@playwright/test";
 import { expect, loginAs, seed, test, type Player } from "./helpers";
 import { isoToRomeLocal } from "../src/lib/format";
 
+// la busta si prova con l'animazione completa
+test.use({ reducedMotion: "no-preference" });
+
 const SEASON = "/cineforums/1/seasons/1";
 const API = `/api${SEASON}`;
 // chi ha candidato cosa nel seed (cinofili-be/scripts/e2e-seed.js)

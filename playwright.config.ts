@@ -15,7 +15,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: "list",
-  use: { baseURL: "http://localhost:3055", trace: "retain-on-failure" },
+  // sipario e comparse spenti: li provano curtain.spec.ts e gli spec della busta, che tornano a "no-preference"
+  use: { baseURL: "http://localhost:3055", trace: "retain-on-failure", reducedMotion: "reduce" },
   projects: [{ name: "iphone", use: { ...devices["iPhone 13"], defaultBrowserType: "chromium" } }],
   webServer: [
     backendServer,

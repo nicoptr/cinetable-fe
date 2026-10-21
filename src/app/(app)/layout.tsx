@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { unstable_rethrow } from "next/navigation";
 import type { ReactNode } from "react";
 import { AppHeader } from "@/components/AppHeader";
+import { Curtain } from "@/components/Curtain";
 import { apiServer } from "@/lib/api-server";
 import type { Me, MyInvitation } from "@/lib/types";
 
@@ -33,6 +34,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     <>
       <AppHeader pending={pending} user={user} />
       {children}
+      <Curtain />
     </>
   );
 }

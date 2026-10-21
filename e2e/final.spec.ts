@@ -1,6 +1,9 @@
 import type { Page } from "@playwright/test";
 import { expect, expectNoHorizontalScroll, loginAs, seed, test } from "./helpers";
 
+// la busta si prova con l'animazione completa
+test.use({ reducedMotion: "no-preference" });
+
 const SEASON = "/cineforums/1/seasons/1";
 const SUMMARY = `${SEASON}/summary`;
 

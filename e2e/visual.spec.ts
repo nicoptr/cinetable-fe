@@ -4,7 +4,7 @@ import { isoToRomeLocal } from "../src/lib/format";
 
 const SEASON = "/cineforums/1/seasons/1";
 
-type Shot = { name: string; scenario: Scenario; as?: Player; path: string; setup?: (page: Page) => Promise<void>; instant?: boolean };
+type Shot = { name: string; scenario: Scenario; as?: Player; path: string; setup?: (page: Page) => Promise<void>; instant?: boolean; motion?: boolean };
 
 async function createDraft(page: Page) {
   await page.goto("/cineforums/1/seasons/new");
@@ -68,11 +68,11 @@ const SHOTS: Shot[] = [
   { name: "profile", scenario: "base", as: "anna", path: "/profile" },
   { name: "season-open", scenario: "open", as: "anna", path: SEASON },
   { name: "season-screening", scenario: "screening", as: "anna", path: SEASON },
-  { name: "season-screening-opened", scenario: "screening", as: "anna", path: SEASON, setup: (p) => opened(p, /Film n\. 1/) },
-  { name: "season-screening-midway", scenario: "screening", as: "anna", path: SEASON, setup: (p) => midway(p, /Film n\. 1/), instant: true },
+  { name: "season-screening-opened", scenario: "screening", as: "anna", path: SEASON, setup: (p) => opened(p, /Film n\. 1/), motion: true },
+  { name: "season-screening-midway", scenario: "screening", as: "anna", path: SEASON, setup: (p) => midway(p, /Film n\. 1/), instant: true, motion: true },
   { name: "season-final", scenario: "final", as: "anna", path: SEASON },
-  { name: "season-final-opened", scenario: "final", as: "anna", path: SEASON, setup: (p) => opened(p, /^Miglior film\./) },
-  { name: "season-final-midway", scenario: "final", as: "anna", path: SEASON, setup: (p) => midway(p, /^Miglior film\./), instant: true },
+  { name: "season-final-opened", scenario: "final", as: "anna", path: SEASON, setup: (p) => opened(p, /^Miglior film\./), motion: true },
+  { name: "season-final-midway", scenario: "final", as: "anna", path: SEASON, setup: (p) => midway(p, /^Miglior film\./), instant: true, motion: true },
   { name: "film-vote", scenario: "final", as: "anna", path: `${SEASON}/films/2` },
   { name: "film-own", scenario: "final", as: "anna", path: `${SEASON}/films/1` },
   { name: "season-done", scenario: "done", as: "anna", path: SEASON },
@@ -85,6 +85,8 @@ for (const width of [360, 1280]) {
 
     for (const shot of SHOTS) {
       test(shot.name, async ({ page }) => {
+        // le buste si aprono con l'animazione vera, come per l'utente; le altre pagine si scattano ferme
+        if (shot.motion) await page.emulateMedia({ reducedMotion: "no-preference" });
         seed(shot.scenario);
         if (shot.as) await loginAs(page, shot.as);
         if (shot.path) await page.goto(shot.path);
