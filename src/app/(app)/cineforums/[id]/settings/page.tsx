@@ -23,7 +23,8 @@ export default async function SettingsPage({ params }: { params: Promise<{ id: s
         nameLabel="Nome della categoria"
         extraLabel="Descrizione"
         extraKey="description"
-        addLabel="Aggiungi categoria"
+        newLabel="Nuova categoria"
+        addedLabel="Categoria aggiunta"
       />
       <ItemEditor
         title="Premi"
@@ -32,7 +33,8 @@ export default async function SettingsPage({ params }: { params: Promise<{ id: s
         nameLabel="Nome del premio"
         extraLabel="Domanda di voto"
         extraKey="question"
-        addLabel="Aggiungi premio"
+        newLabel="Nuovo premio"
+        addedLabel="Premio aggiunto"
       />
     </>
   );
