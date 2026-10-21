@@ -13,6 +13,7 @@ test("azione senza errore in pagina: un 500 mostra l'avviso, che si chiude col t
   const toasts = page.getByRole("status", { name: "Avvisi" }).getByRole("listitem");
   await expect(toasts).toHaveCount(1);
   await expect(toasts).toHaveText("Servizio non disponibile, riprova tra poco");
+  await expect(toasts.first().getByRole("button")).toHaveAccessibleDescription("Tocca per chiudere");
   await expect(page.locator("main [role=alert]")).toHaveCount(0);
   await toasts.first().click();
   await expect(toasts).toHaveCount(0);
@@ -31,4 +32,17 @@ test("un 400 senza errore in pagina mostra il messaggio del backend; al massimo 
     await expect(toasts).toHaveCount(Math.min(i + 1, 3));
   }
   await expect(toasts.first()).toHaveText("Non si può togliere");
+});
+
+test("Sposta la scadenza: l'errore resta accanto al campo, senza avviso", async ({ page }) => {
+  seed("open");
+  await page.route("**/api/cineforums/1/seasons/1", (r) =>
+    r.request().method() === "PATCH" ? r.fulfill({ status: 400, json: { error: "HttpError", code: "400", message: "La chiusura delle candidature deve essere futura" } }) : r.fallback(),
+  );
+  await loginAs(page, "anna");
+  await page.goto(SEASON);
+  await page.getByRole("button", { name: "Salva scadenza" }).click();
+  await expect(page.getByText("La chiusura delle candidature deve essere futura")).toBeVisible();
+  await expect(page.getByLabel("Sposta la scadenza")).toHaveAttribute("aria-invalid", "true");
+  await expect(page.getByRole("status", { name: "Avvisi" }).getByRole("listitem")).toHaveCount(0);
 });

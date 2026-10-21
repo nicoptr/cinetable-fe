@@ -71,6 +71,8 @@ test("bozza incompleta: si salva, l'avvio elenca i problemi accanto al bottone, 
   await page.getByRole("button", { name: "Modifica" }).click();
   for (const l of ["bruno", "carla", "dario"]) await page.getByLabel(l).check();
   await page.getByRole("button", { name: "Salva" }).click();
+  await expect(page.getByRole("button", { name: "Modifica" })).toBeVisible();
+  await expect(problems).toHaveCount(0);
   await page.getByRole("button", { name: "Avvia l'edizione" }).click();
   await page.getByRole("button", { name: /Tocca di nuovo/ }).click();
   await expect(page.getByText("Candidature aperte", { exact: true })).toBeVisible();

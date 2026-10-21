@@ -54,12 +54,15 @@ test("nuova categoria: Annulla chiude il form, Salva la aggiunge con la conferma
   await page.goto("/cineforums/1/settings");
   await page.getByRole("button", { name: "+ Nuova categoria" }).click();
   await expect(page.getByRole("heading", { name: "Nuova categoria" })).toBeVisible();
+  await expect(page.getByLabel("Nome della categoria")).toBeFocused();
   await page.getByRole("button", { name: "Annulla" }).click();
   await expect(page.getByRole("heading", { name: "Nuova categoria" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "+ Nuova categoria" })).toBeFocused();
   await page.getByRole("button", { name: "+ Nuova categoria" }).click();
   await page.getByLabel("Nome della categoria").fill("Western");
   await page.getByRole("button", { name: "Salva" }).click();
   await expect(page.getByText("Categoria aggiunta")).toBeVisible();
+  await expect(page.getByRole("button", { name: "+ Nuova categoria" })).toBeFocused();
   await expect(page.getByRole("heading", { name: "Nuova categoria" })).toHaveCount(0);
   await expect(page.getByRole("listitem").filter({ hasText: "Western" })).toBeVisible();
 });

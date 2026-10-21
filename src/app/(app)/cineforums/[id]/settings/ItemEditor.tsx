@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Button, ConfirmButton, Field, Notice } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 
@@ -23,6 +23,14 @@ type Props = {
 export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey, newLabel, addedLabel }: Props) {
   const router = useRouter();
   const [adding, setAdding] = useState(false);
+  // dopo Annulla o Salva il fuoco torna su "+ Nuova …"
+  const refocus = useRef(false);
+  const addButton = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (adding || !refocus.current) return;
+    refocus.current = false;
+    addButton.current?.querySelector("button")?.focus();
+  }, [adding]);
   const [added, setAdded] = useState(false);
   const [name, setName] = useState("");
   const [extra, setExtra] = useState("");
@@ -57,7 +65,8 @@ export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey
     }
   }
 
-  function closeAdd() {
+  function closeAdd(focus = true) {
+    refocus.current = focus;
     setAdding(false);
     setName("");
     setExtra("");
@@ -104,7 +113,7 @@ export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey
                   onClick={() => {
                     setError(null);
                     setAdded(false);
-                    closeAdd();
+                    closeAdd(false);
                     setEditing(i.id);
                     setDraft({ name: i.name, extra: i.extra });
                   }}
@@ -128,30 +137,32 @@ export function ItemEditor({ title, path, items, nameLabel, extraLabel, extraKey
       {adding ? (
         <form onSubmit={add} className="border-t border-line pt-4">
           <h3 className="mb-3 font-serif text-xl">{newLabel}</h3>
-          <Field label={nameLabel} value={name} error={err(0)} onChange={(e) => setName(e.target.value)} />
+          <Field label={nameLabel} autoFocus value={name} error={err(0)} onChange={(e) => setName(e.target.value)} />
           <Field label={extraLabel} textarea value={extra} onChange={(e) => setExtra(e.target.value)} />
           <div className="flex items-center gap-6">
             <Button type="submit" pending={busy} pendingLabel="Salvataggio…">
               Salva
             </Button>
-            <Button variant="secondary" disabled={busy} onClick={closeAdd}>
+            <Button variant="secondary" disabled={busy} onClick={() => closeAdd()}>
               Annulla
             </Button>
           </div>
         </form>
       ) : (
-        <Button
-          disabled={busy}
-          className="w-full"
-          onClick={() => {
-            setError(null);
-            setAdded(false);
-            setEditing(null);
-            setAdding(true);
-          }}
-        >
-          + {newLabel}
-        </Button>
+        <div ref={addButton}>
+          <Button
+            disabled={busy}
+            className="w-full"
+            onClick={() => {
+              setError(null);
+              setAdded(false);
+              setEditing(null);
+              setAdding(true);
+            }}
+          >
+            + {newLabel}
+          </Button>
+        </div>
       )}
     </section>
   );

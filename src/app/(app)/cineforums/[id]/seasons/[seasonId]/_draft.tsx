@@ -12,17 +12,18 @@ type Editor = { members: { userId: number; username: string }[]; categories: { i
 export function Draft({ cineforumId, season, members, categories, awards }: { cineforumId: string; season: SeasonView } & Partial<Editor>) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // ogni azione mostra il suo errore accanto al suo bottone
+  const [error, setError] = useState<{ action: "launch" | "delete"; message: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const base = `/cineforums/${cineforumId}/seasons/${season.id}`;
 
-  async function run(fn: () => Promise<void>) {
+  async function run(action: "launch" | "delete", fn: () => Promise<void>) {
     setBusy(true);
     setError(null);
     try {
       await fn();
     } catch (err) {
-      setError((err as ApiError).message);
+      setError({ action, message: (err as ApiError).message });
     } finally {
       setBusy(false);
     }
@@ -54,7 +55,7 @@ export function Draft({ cineforumId, season, members, categories, awards }: { ci
             disabled={busy}
             className="w-full"
             confirmLabel="Tocca di nuovo: partono le email con le categorie segrete"
-            onConfirm={() => run(async () => {
+            onConfirm={() => run("launch", async () => {
               await api(`${base}/launch`, { quiet: true, method: "POST" });
               router.refresh();
             })}
@@ -62,18 +63,25 @@ export function Draft({ cineforumId, season, members, categories, awards }: { ci
             Avvia l&apos;edizione
           </ConfirmButton>
           {/* sotto il bottone: l'avvio elenca tutto quello che manca */}
-          {error && (
+          {error?.action === "launch" && (
             <div className="w-full">
-              <Notice tone="error">{error}</Notice>
+              <Notice tone="error">{error.message}</Notice>
             </div>
           )}
-          <Button variant="secondary" disabled={busy} onClick={() => setEditing(true)}>
+          <Button
+            variant="secondary"
+            disabled={busy}
+            onClick={() => {
+              setError(null); // dopo la modifica l'elenco dei problemi sarebbe vecchio
+              setEditing(true);
+            }}
+          >
             Modifica
           </Button>
           <ConfirmButton
             variant="danger"
             disabled={busy}
-            onConfirm={() => run(async () => {
+            onConfirm={() => run("delete", async () => {
               await api(base, { quiet: true, method: "DELETE" });
               router.push(`/cineforums/${cineforumId}`);
               router.refresh();
@@ -81,6 +89,11 @@ export function Draft({ cineforumId, season, members, categories, awards }: { ci
           >
             Elimina bozza
           </ConfirmButton>
+          {error?.action === "delete" && (
+            <div className="w-full">
+              <Notice tone="error">{error.message}</Notice>
+            </div>
+          )}
         </div>
       ) : (
         <p className="mt-6 text-muted">L&apos;edizione sta per iniziare.</p>

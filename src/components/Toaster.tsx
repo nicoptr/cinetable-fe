@@ -13,12 +13,16 @@ export function Toaster() {
       aria-label="Avvisi"
       className="pointer-events-none fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md md:right-6 md:left-auto md:mx-0 md:w-96 print:hidden"
     >
+      <span id="toast-hint" hidden>
+        Tocca per chiudere
+      </span>
       <ul className="flex flex-col gap-2">
         {toasts.map((t) => (
           <li key={t.id}>
             <button
               type="button"
               onClick={() => dismiss(t.id)}
+              aria-describedby="toast-hint"
               className="pointer-events-auto min-h-11 w-full rounded border border-l-2 border-line border-l-error bg-surface px-4 py-3 text-left text-base text-ink shadow-lg shadow-black/40"
             >
               {t.text}

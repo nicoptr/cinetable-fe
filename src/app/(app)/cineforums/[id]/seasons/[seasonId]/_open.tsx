@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, ConfirmButton, Field, Notice, Poster } from "@/components/ui";
 import { MovieSearch } from "@/components/MovieSearch";
-import { api } from "@/lib/api";
+import { api, errorText } from "@/lib/api";
 import { formatDateTime, isoToRomeLocal, romeLocalToIso } from "@/lib/format";
 import type { CandidatureProgress, MyCandidature, SeasonView } from "@/lib/types";
 
@@ -12,6 +12,7 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
   const router = useRouter();
   const [searching, setSearching] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [closeError, setCloseError] = useState<string | null>(null);
   const serverCloseAt = isoToRomeLocal(season.candidaturesCloseAt);
   const [edit, setEdit] = useState({ from: serverCloseAt, value: serverCloseAt });
   // segue il valore del server dopo router.refresh()
@@ -21,7 +22,7 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
   const { valid, expected } = season.candidatures;
   const passed = new Date(season.candidaturesCloseAt) <= new Date();
 
-  /** L'errore lo mostra l'avviso di api(): qui niente messaggio in fondo alla pagina, lontano dalla riga. */
+  /** Senza `quiet` l'errore lo mostra l'avviso di api(); con `quiet` lo mostra il chiamante. */
   async function run(fn: () => Promise<void>) {
     setBusy(true);
     try {
@@ -96,10 +97,18 @@ export function Open({ cineforumId, season, mine, progress }: { cineforumId: str
             className="mt-4"
             onSubmit={(e) => {
               e.preventDefault();
-              void run(() => api(base, { method: "PATCH", body: { candidaturesCloseAt: romeLocalToIso(closeAt) } }));
+              void run(async () => {
+                setCloseError(null);
+                try {
+                  await api(base, { quiet: true, method: "PATCH", body: { candidaturesCloseAt: romeLocalToIso(closeAt) } });
+                } catch (err) {
+                  setCloseError(errorText(err));
+                  throw err;
+                }
+              });
             }}
           >
-            <Field label="Sposta la scadenza" type="datetime-local" value={closeAt} onChange={(e) => setCloseAt(e.target.value)} required />
+            <Field label="Sposta la scadenza" type="datetime-local" error={closeError} value={closeAt} onChange={(e) => setCloseAt(e.target.value)} required />
             <Button type="submit" disabled={busy} className="w-full">
               Salva scadenza
             </Button>
