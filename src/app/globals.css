@@ -656,12 +656,14 @@ button.env[data-pending] .env-seal {
 .env-film {
   display: grid;
   place-items: center;
+  width: 100%;
   /* alta quanto la pellicola: il passaggio dallo schermo al film non sposta nulla */
   min-height: calc(13rem * 1.5 + 1rem);
 }
 .leader {
   position: relative;
-  width: min(18rem, 80vw);
+  /* la cornice nera (box-shadow da 6px) deve stare nel contenitore */
+  width: min(18rem, calc(100% - 12px));
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 6px;
