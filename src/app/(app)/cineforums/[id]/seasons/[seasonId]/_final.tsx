@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { AwardReveal } from "@/components/AwardReveal";
 import { AwardWinners } from "@/components/AwardWinners";
-import { Envelope, ENVELOPE_ANIMATION_MS } from "@/components/Envelope";
+import { Envelope } from "@/components/Envelope";
 import { Avatar, Poster, Section } from "@/components/ui";
 import { api } from "@/lib/api";
 import type { AwardResult, SeasonResults, SeasonView } from "@/lib/types";
@@ -12,16 +13,18 @@ import type { AwardResult, SeasonResults, SeasonView } from "@/lib/types";
  * Serata finale: le buste degli award (solo presidente) e i risultati già aperti.
  * Sta nello stesso punto dell'albero in SCREENING, FINAL e DONE: dopo `router.refresh()`
  * la busta appena aperta resta montata e aperta, e non si ripete tra i risultati.
- * Una busta alla volta: mentre una si apre (risposta e animazione) le altre sono disabilitate.
+ * Una busta alla volta: mentre una si apre (risposta e sequenza di AwardReveal) le altre sono disabilitate.
  */
 export function FinalNight({
   base,
   awards,
+  films,
   president,
   results,
 }: {
   base: string;
   awards: SeasonView["awards"];
+  films: SeasonView["program"][number]["movie"][];
   president: boolean;
   results: SeasonResults | null;
 }) {
@@ -41,6 +44,7 @@ export function FinalNight({
             <Envelope
               key={a.id}
               label={a.name}
+              closeLabel="Richiudi la busta"
               disabled={opening !== null && opening !== a.id}
               onOpen={async () => {
                 setOpening(a.id);
@@ -52,15 +56,9 @@ export function FinalNight({
                   router.refresh();
                   throw err;
                 }
-                setTimeout(() => setOpening(null), ENVELOPE_ANIMATION_MS);
                 setJustOpened((ids) => [...ids, a.id]);
                 router.refresh();
-                return (
-                  <>
-                    <h3 className="mb-4 font-serif text-xl text-gold">{result.name}</h3>
-                    <AwardWinners award={result} envelope />
-                  </>
-                );
+                return <AwardReveal award={result} films={films} onDone={() => setOpening(null)} />;
               }}
             />
           ))}

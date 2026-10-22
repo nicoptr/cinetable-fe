@@ -23,6 +23,8 @@ async function open(page: Page, award: string) {
   await envelope(page, award).click();
 }
 
+const skip = (page: Page) => page.getByRole("button", { name: "Salta »" }).click();
+
 test("anna apre le due buste; all'ultima l'edizione è conclusa", async ({ page }) => {
   seed("final");
   await loginAs(page, "anna");
@@ -30,18 +32,28 @@ test("anna apre le due buste; all'ultima l'edizione è conclusa", async ({ page 
   await expect(page.getByText("Serata finale", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Le buste" })).toBeVisible();
 
+  // la prima per intero: sala al buio, annuncio, riflettore sui quattro candidati, vincitore, media, proponente
   await open(page, "Miglior film");
   const film = page.getByRole("region", { name: "Miglior film" });
-  await expect(film.getByRole("heading", { name: "Fight Club" })).toBeVisible();
-  await expect(film).toContainText("proposto da carla");
-  await expect(film).toContainText("90,0");
+  const dimmer = page.locator(".award-dimmer[data-on]");
+  await expect(dimmer).toHaveCount(1);
+  await expect(film).toContainText("E l'award «Miglior film» va a…", { timeout: 5000 });
+  await expect(film.locator(".award-nominees li")).toHaveCount(4);
+  await expect(film.locator(".award-nominees li[data-lit]")).toHaveCount(1, { timeout: 5000 });
+  await expect(film.getByRole("heading", { name: "Fight Club" })).toBeVisible({ timeout: 10000 });
+  await expect(film.locator(".award-nominees")).toHaveCount(0);
+  await expect(film).toContainText("90,0", { timeout: 5000 });
   await expect(film).toContainText("3 voti");
-  await expect(page.locator(".env-content")).toBeFocused();
+  await expect(film.locator(".award-proposer[data-on]")).toContainText("carla", { timeout: 5000 });
+  await expect(dimmer).toHaveCount(0, { timeout: 5000 });
 
+  // la seconda saltando la suspense
   await open(page, "Miglior regia");
   const direction = page.getByRole("region", { name: "Miglior regia" });
+  await skip(page);
+  await expect(page.locator(".env-content").last()).toBeFocused();
   await expect(direction.getByRole("heading", { name: "La cosa" })).toBeVisible();
-  await expect(direction).toContainText("proposto da anna");
+  await expect(direction.locator(".award-proposer[data-on]")).toContainText("anna", { timeout: 5000 });
 
   await page.reload();
   await expect(page.getByText("Edizione conclusa")).toBeVisible();
@@ -65,9 +77,9 @@ test("una busta alla volta: mentre una si apre l'altra è disabilitata", async (
   await expect(envelope(page, "Miglior regia")).toBeDisabled();
   release();
   const film = page.getByRole("region", { name: "Miglior film" });
-  await expect(film.getByRole("heading", { level: 3, name: "Miglior film" })).toBeVisible();
-  await expect(film.getByRole("heading", { level: 4, name: "Fight Club" })).toBeVisible();
-  // anche durante l'animazione
+  await skip(page);
+  await expect(film.getByRole("heading", { level: 3, name: "Fight Club" })).toBeVisible();
+  // anche durante la rivelazione
   await expect(envelope(page, "Miglior regia")).toBeDisabled();
   await expect(envelope(page, "Miglior regia")).toBeEnabled({ timeout: 5000 });
 });

@@ -5,6 +5,8 @@ import { SealMark } from "@/components/Logo";
 import { Button, Notice, useConfirm } from "@/components/ui";
 import { errorText } from "@/lib/api";
 
+type Opened = { label: string; content: ReactNode };
+
 const SPARKS = Array.from({ length: 12 }, (_, i) => ({ "--a": `${i * 30 + (i % 2) * 11}deg`, "--d": `${64 + (i % 3) * 22}px` }) as CSSProperties);
 
 /**
@@ -15,11 +17,6 @@ const SPARKS = Array.from({ length: 12 }, (_, i) => ({ "--a": `${i * 30 + (i % 2
  * con `envelope-caption` (appare per ultima).
  * Con `closeLabel` la busta aperta si può richiudere e riaprire: rivede la stessa animazione, senza richiamare `onOpen`.
  */
-/** Dalla risposta del server alla fine dell'animazione (globals.css, `.env-*`). */
-export const ENVELOPE_ANIMATION_MS = 2500;
-
-type Opened = { label: string; content: ReactNode };
-
 export function Envelope({ label, onOpen, disabled = false, closeLabel }: { label: string; onOpen: () => Promise<ReactNode>; disabled?: boolean; closeLabel?: string }) {
   // l'etichetta resta quella della busta aperta anche se il genitore passa già la prossima
   const [opened, setOpened] = useState<Opened | null>(null);

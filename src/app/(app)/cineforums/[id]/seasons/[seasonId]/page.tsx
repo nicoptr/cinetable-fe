@@ -71,6 +71,7 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
         <FinalNight
           base={base}
           awards={s.awards}
+          films={s.program.map((p) => p.movie)}
           president={president}
           results={results}
         />

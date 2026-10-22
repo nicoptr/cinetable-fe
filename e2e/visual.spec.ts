@@ -22,12 +22,6 @@ async function openEnvelope(page: Page, name: RegExp) {
   await expect(page.locator(".env-content")).toBeVisible();
 }
 
-async function opened(page: Page, name: RegExp) {
-  await openEnvelope(page, name);
-  const caption = page.locator(".env-content .envelope-caption").last();
-  await expect.poll(() => caption.evaluate((e) => getComputedStyle(e).opacity), { timeout: 5000 }).toBe("1");
-}
-
 /** La busta del film c'è solo con la proiezione programmata; a busta aperta si salta il conto alla rovescia. */
 async function scheduled(page: Page) {
   await scheduleNext(page, `/api${SEASON}`);
@@ -45,6 +39,19 @@ async function countdown(page: Page) {
   await scheduled(page);
   await openEnvelope(page, /Film n\. 1/);
   await page.waitForTimeout(3300);
+}
+
+/** Award: a metà del riflettore sui candidati, e a rivelazione finita. */
+async function awardSpotlight(page: Page) {
+  await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+  await openEnvelope(page, /^Miglior film\./);
+  await expect(page.locator(".award-nominees li[data-lit]")).toHaveCount(1, { timeout: 8000 });
+  await page.waitForTimeout(1200);
+}
+async function awardRevealed(page: Page) {
+  await openEnvelope(page, /^Miglior film\./);
+  await page.getByRole("button", { name: "Salta »" }).click();
+  await expect(page.locator(".award-dimmer[data-on]")).toHaveCount(0, { timeout: 6000 });
 }
 
 /** A metà apertura: lembo aperto, busta che scende, locandina che sale. */
@@ -91,7 +98,8 @@ const SHOTS: Shot[] = [
   { name: "season-screening-midway", scenario: "screening", as: "anna", path: SEASON, setup: async (p) => (await scheduled(p), midway(p, /Film n\. 1/)), instant: true, motion: true },
   { name: "season-screening-countdown", scenario: "screening", as: "anna", path: SEASON, setup: countdown, instant: true, motion: true },
   { name: "season-final", scenario: "final", as: "anna", path: SEASON },
-  { name: "season-final-opened", scenario: "final", as: "anna", path: SEASON, setup: (p) => opened(p, /^Miglior film\./), motion: true },
+  { name: "season-final-opened", scenario: "final", as: "anna", path: SEASON, setup: awardRevealed, motion: true },
+  { name: "season-final-spotlight", scenario: "final", as: "anna", path: SEASON, setup: awardSpotlight, instant: true, motion: true },
   { name: "season-final-midway", scenario: "final", as: "anna", path: SEASON, setup: (p) => midway(p, /^Miglior film\./), instant: true, motion: true },
   { name: "film-vote", scenario: "final", as: "anna", path: `${SEASON}/films/2` },
   { name: "film-own", scenario: "final", as: "anna", path: `${SEASON}/films/1` },
