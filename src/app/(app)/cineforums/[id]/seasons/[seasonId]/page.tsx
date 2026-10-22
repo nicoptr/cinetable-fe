@@ -56,7 +56,7 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
         </p>
       )}
       {/* stesso punto dell'albero in OPEN e SCREENING: la busta aperta sopravvive al cambio di stato */}
-      {president && (s.status === "OPEN" || s.status === "SCREENING") && <RevealNext base={base} next={s.program.length + 1} available={canReveal} />}
+      {president && (s.status === "OPEN" || s.status === "SCREENING") && <RevealNext base={base} next={s.program.length + 1} available={canReveal && s.nextScreening !== null} />}
       <NextScreening base={president && canReveal ? base : undefined} next={s.nextScreening} />
       {s.status === "DONE" && (
         <div className="mb-8 border-y border-gold py-4 text-center">

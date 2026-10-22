@@ -42,3 +42,17 @@ export async function expectNoHorizontalScroll(page: Page) {
   const fits = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
   expect(fits, "la pagina scorre in orizzontale").toBe(true);
 }
+
+/** Prossima proiezione dell'edizione `api` (es. `/api/cineforums/1/seasons/1`): senza, la busta del film non si apre. Di default fra un giorno. */
+export async function scheduleNext(page: Page, api: string, screeningAt = new Date(Date.now() + 86400000).toISOString()) {
+  expect((await page.request.post(`${api}/next-screening`, { data: { screeningAt, location: "Sala Verdi" } })).ok()).toBe(true);
+}
+
+/** Programma e svela il prossimo film; con `screenedInMs` la proiezione è già avvenuta al ritorno. */
+export async function scheduleAndReveal(page: Page, api: string, screenedInMs?: number) {
+  await scheduleNext(page, api, screenedInMs === undefined ? undefined : new Date(Date.now() + screenedInMs).toISOString());
+  const res = await page.request.post(`${api}/reveal-next`);
+  expect(res.ok()).toBe(true);
+  if (screenedInMs !== undefined) await page.waitForTimeout(screenedInMs);
+  return res.json();
+}

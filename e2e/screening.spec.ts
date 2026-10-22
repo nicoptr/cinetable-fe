@@ -1,6 +1,5 @@
 import type { Page } from "@playwright/test";
-import { expect, loginAs, seed, test, type Player } from "./helpers";
-import { isoToRomeLocal } from "../src/lib/format";
+import { expect, loginAs, scheduleAndReveal, scheduleNext, seed, test, type Player } from "./helpers";
 
 // la busta si prova con l'animazione completa
 test.use({ reducedMotion: "no-preference" });
@@ -30,14 +29,58 @@ async function expectContentVisible(page: Page, timeout = 5000) {
 }
 
 const envelope = (page: Page, n: number) => page.getByRole("button", { name: new RegExp(`Film n\\. ${n}`) });
+const skip = (page: Page) => page.getByRole("button", { name: "Salta il conto alla rovescia" }).click();
+
+test("senza proiezione programmata la busta non c'è", async ({ page }) => {
+  seed("screening");
+  await loginAs(page, "anna");
+  await page.goto(SEASON);
+  await expect(page.getByText("Fissa data e luogo della serata: poi potrai aprire la busta del film.")).toBeVisible();
+  await expect(envelope(page, 1)).toHaveCount(0);
+});
+
+test("conto alla rovescia da 5 a 1, poi il film; richiusa, la busta lo rimostra senza svelarne un altro", async ({ page }) => {
+  seed("screening");
+  await loginAs(page, "anna");
+  await scheduleNext(page, API);
+  await page.goto(SEASON);
+  let reveals = 0;
+  page.on("request", (r) => {
+    if (r.method() === "POST" && r.url().endsWith("/reveal-next")) reveals++;
+  });
+  await envelope(page, 1).click();
+  await envelope(page, 1).click();
+  const reveal = page.getByRole("region", { name: "Film n. 1" });
+  const number = reveal.locator(".leader-num");
+  for (const n of ["5", "4", "3", "2", "1"]) await expect(number).toHaveText(n, { timeout: 4000 });
+  await expect(reveal.getByRole("heading", { name: TITLES })).toBeVisible({ timeout: 3000 });
+  await expect(number).toHaveCount(0);
+  await expectContentVisible(page);
+  const title = await reveal.getByRole("heading").textContent();
+
+  await page.getByRole("button", { name: "Richiudi la busta" }).click();
+  await expect(envelope(page, 1)).toBeFocused();
+  await envelope(page, 1).click();
+  await envelope(page, 1).click();
+  await expect(number).toHaveText("5");
+  await skip(page);
+  await expect(reveal.getByRole("heading")).toHaveText(title!);
+  // saltato, il conto alla rovescia non riparte
+  await page.waitForTimeout(6000);
+  await expect(number).toHaveCount(0);
+  expect(reveals).toBe(1);
+  expect(await program(page)).toHaveLength(1);
+});
 
 test("anna svela il primo film con la busta e lo vede nel programma", async ({ page }) => {
   seed("screening");
   await loginAs(page, "anna");
+  await scheduleNext(page, API);
   await page.goto(SEASON);
   await envelope(page, 1).click();
   await expect(envelope(page, 1)).toContainText("Tocca di nuovo per aprire");
   await envelope(page, 1).click();
+  await skip(page);
   const reveal = page.getByRole("region", { name: "Film n. 1" });
   await expect(reveal.getByRole("heading", { name: TITLES })).toBeVisible();
   const [first] = await program(page);
@@ -56,6 +99,7 @@ test("anna svela il primo film con la busta e lo vede nel programma", async ({ p
 test("doppio tocco sulla busta non svela due film", async ({ page }) => {
   seed("screening");
   await loginAs(page, "anna");
+  await scheduleNext(page, API);
   await page.goto(SEASON);
   let reveals = 0;
   page.on("request", (r) => {
@@ -67,6 +111,7 @@ test("doppio tocco sulla busta non svela due film", async ({ page }) => {
     b.click();
     b.click();
   });
+  await skip(page);
   await expect(page.getByRole("region", { name: "Film n. 1" }).getByRole("heading", { name: TITLES })).toBeVisible();
   expect(reveals).toBe(1);
   expect(await program(page)).toHaveLength(1);
@@ -76,15 +121,9 @@ test("doppio tocco sulla busta non svela due film", async ({ page }) => {
 test("programmo la proiezione e apro il voto; bruno vota con gli slider", async ({ page }) => {
   seed("screening");
   await loginAs(page, "anna");
-  const res = await page.request.post(`${API}/reveal-next`);
-  expect(res.ok()).toBe(true);
-  const item: Item = await res.json();
+  const item: Item = await scheduleAndReveal(page, API, 1500);
   await page.goto(`${SEASON}/films/1`);
   await expect(page.getByRole("heading", { name: item.movie.title, level: 1 })).toBeVisible();
-
-  await page.getByLabel("Data e ora").fill(isoToRomeLocal(new Date(Date.now() - 86400000).toISOString()));
-  await page.getByLabel("Dove").fill("Sala Verdi");
-  await page.getByRole("button", { name: "Salva la proiezione" }).click();
   await expect(page.getByText("Sala Verdi")).toBeVisible();
   const open = page.getByRole("button", { name: "Apri il voto" });
   await open.click();
@@ -137,9 +176,7 @@ test("programmo la proiezione e apro il voto; bruno vota con gli slider", async 
 test("un tocco sul cursore a riposo (50) conta come voto", async ({ page }) => {
   seed("screening");
   await loginAs(page, "anna");
-  const item: Item = await (await page.request.post(`${API}/reveal-next`)).json();
-  const yesterday = new Date(Date.now() - 86400000).toISOString();
-  expect((await page.request.patch(`${API}/program/1/screening`, { data: { screeningAt: yesterday, location: "Sala Verdi" } })).ok()).toBe(true);
+  const item: Item = await scheduleAndReveal(page, API, 1500);
   expect((await page.request.post(`${API}/program/1/open-voting`)).ok()).toBe(true);
   await switchTo(page, PROPOSER[item.movie.tmdbId] === "bruno" ? "carla" : "bruno");
   await page.goto(`${SEASON}/films/1`);
@@ -176,6 +213,7 @@ test("con prefers-reduced-motion la busta si apre comunque", async ({ page }) =>
   seed("screening");
   await page.emulateMedia({ reducedMotion: "reduce" });
   await loginAs(page, "anna");
+  await scheduleNext(page, API);
   await page.goto(SEASON);
   await envelope(page, 1).click();
   await envelope(page, 1).click();
@@ -185,4 +223,5 @@ test("con prefers-reduced-motion la busta si apre comunque", async ({ page }) =>
   await expect(reveal.getByRole("heading")).toHaveText(first.movie.title);
   expect(await page.locator(".env-content").evaluate((e) => getComputedStyle(e).animationDuration)).toBe("0.3s");
   await expectContentVisible(page, 1000);
+  await expect(page.getByRole("button", { name: "Salta il conto alla rovescia" })).toHaveCount(0);
 });

@@ -495,7 +495,7 @@ button.env[data-pending] .env-seal {
   animation: env-caption 600ms ease-out 1900ms both;
 }
 /* titolo e resto arrivano quando la locandina è fuori dalla busta; `envelope-group` raggruppa più locandine (ex aequo) */
-.env-stage[data-open] .env-content > :not(.envelope-poster, .envelope-caption, .envelope-group),
+.env-stage[data-open] .env-content > :not(.envelope-poster, .envelope-caption, .envelope-group, .env-film),
 .env-stage[data-open] .envelope-title {
   animation: env-caption 500ms ease-out 1450ms both;
 }
@@ -644,6 +644,192 @@ button.env[data-pending] .env-seal {
 @keyframes env-fade-in {
   0% {
     opacity: 0;
+  }
+}
+
+/*
+ * Svelamento di un film (cineforums/.../_reveal.tsx): dalla busta esce lo schermo del conto alla rovescia,
+ * 5…1 da 1 s a partire da 1900 ms (LEADER_START_MS); poi la pellicola scorre e si ferma sul film (1200 ms).
+ * Locandina, titolo e didascalia si montano a fine conto: i loro ritardi `.env-*` contano da lì.
+ */
+.env-film {
+  display: grid;
+  place-items: center;
+  /* alta quanto la pellicola: il passaggio dallo schermo al film non sposta nulla */
+  min-height: calc(13rem * 1.5 + 1rem);
+}
+.leader {
+  position: relative;
+  width: min(18rem, 80vw);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 6px;
+  background: radial-gradient(ellipse at center, #d6cbb4 0%, #b7aa90 60%, #8a7d66 100%);
+  color: #1d1814;
+  box-shadow:
+    0 18px 50px rgb(0 0 0 / 0.7),
+    0 0 0 6px #0b0a09,
+    0 0 60px rgb(255 236 190 / 0.12);
+  cursor: pointer;
+  animation:
+    leader-weave 180ms steps(2) infinite,
+    leader-flicker 140ms steps(2) infinite;
+}
+.leader > span {
+  position: absolute;
+  pointer-events: none;
+}
+.leader-sweep {
+  inset: 0;
+  background: conic-gradient(from 0deg at 50% 50%, rgb(20 16 12 / 0.5) var(--sweep), transparent 0);
+  animation: leader-sweep 1000ms linear 1900ms 5;
+}
+.leader-cross {
+  inset: 0;
+  background:
+    linear-gradient(rgb(42 35 28 / 0.55), rgb(42 35 28 / 0.55)) center / 100% 1.5px no-repeat,
+    linear-gradient(rgb(42 35 28 / 0.55), rgb(42 35 28 / 0.55)) center / 1.5px 100% no-repeat;
+}
+.leader-ring {
+  left: 50%;
+  top: 50%;
+  width: 74%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border: 2px solid #f4eee2;
+  border-radius: 50%;
+}
+.leader-ring-inner {
+  width: 62%;
+  border-width: 1.5px;
+}
+.leader-num {
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 700 clamp(4rem, 22vw, 6.5rem) / 1 var(--font-serif);
+  text-shadow: 0 0 1px #000;
+}
+.leader-scratch {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgb(255 255 255 / 0.55);
+  animation: leader-scratch 1.3s steps(1) infinite;
+}
+.leader-scratch-dark {
+  width: 2px;
+  background: rgb(0 0 0 / 0.35);
+  animation-duration: 0.9s;
+  animation-delay: -0.4s;
+}
+.leader-grain {
+  inset: -20%;
+  opacity: 0.22;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  box-shadow: inset 0 0 50px 18px rgb(0 0 0 / 0.55);
+  animation: leader-grain 240ms steps(3) infinite;
+}
+.leader-skip {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+  animation: env-caption 400ms ease-out 1900ms both;
+}
+.reel-window {
+  position: relative;
+  width: 15.5rem;
+  height: calc(13rem * 1.5 + 1rem);
+  overflow: hidden;
+}
+.reel {
+  position: absolute;
+  inset: 0 0 auto;
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1.25rem;
+  background: #0b0a09;
+  animation: reel 1200ms cubic-bezier(0.15, 0.6, 0.2, 1) both;
+}
+.reel::before,
+.reel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0.8rem;
+  background: repeating-linear-gradient(180deg, transparent 0 8px, #d9ceb8 8px 18px, transparent 18px 26px);
+}
+.reel::before {
+  left: 0.2rem;
+}
+.reel::after {
+  right: 0.2rem;
+}
+.reel .envelope-poster {
+  box-shadow: none;
+}
+.reel-frame {
+  width: 13rem;
+  aspect-ratio: 2 / 3;
+  border-radius: 4px;
+  background: radial-gradient(#2a2420, #0e0c0b);
+}
+.reel-frame-lit {
+  background: radial-gradient(ellipse, #d6cbb4, #8a7d66);
+}
+.env-film:has(.reel) {
+  filter: drop-shadow(0 14px 40px rgb(201 162 74 / 0.3));
+}
+@property --sweep {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes leader-sweep {
+  to {
+    --sweep: 360deg;
+  }
+}
+@keyframes leader-weave {
+  50% {
+    translate: 0.6px -0.8px;
+  }
+}
+@keyframes leader-flicker {
+  50% {
+    filter: brightness(0.9);
+  }
+}
+@keyframes leader-grain {
+  33% {
+    transform: translate(-4%, 3%);
+  }
+  66% {
+    transform: translate(3%, -5%);
+  }
+}
+@keyframes leader-scratch {
+  0% {
+    left: 23%;
+  }
+  25% {
+    left: 71%;
+    opacity: 0;
+  }
+  50% {
+    left: 38%;
+    opacity: 1;
+  }
+  75% {
+    left: 84%;
+  }
+}
+@keyframes reel {
+  from {
+    transform: translateY(calc(-3 * (13rem * 1.5 + 1rem)));
   }
 }
 

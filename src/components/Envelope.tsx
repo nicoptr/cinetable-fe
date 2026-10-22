@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { SealMark } from "@/components/Logo";
-import { Notice, useConfirm } from "@/components/ui";
+import { Button, Notice, useConfirm } from "@/components/ui";
 import { errorText } from "@/lib/api";
 
 const SPARKS = Array.from({ length: 12 }, (_, i) => ({ "--a": `${i * 30 + (i % 2) * 11}deg`, "--d": `${64 + (i % 3) * 22}px` }) as CSSProperties);
@@ -13,20 +13,28 @@ const SPARKS = Array.from({ length: 12 }, (_, i) => ({ "--a": `${i * 30 + (i % 2
  * la busta resta chiusa e l'errore compare sotto.
  * Il contenuto può marcare la locandina con `envelope-poster` (alone e riflesso) e la didascalia
  * con `envelope-caption` (appare per ultima).
+ * Con `closeLabel` la busta aperta si può richiudere e riaprire: rivede la stessa animazione, senza richiamare `onOpen`.
  */
 /** Dalla risposta del server alla fine dell'animazione (globals.css, `.env-*`). */
 export const ENVELOPE_ANIMATION_MS = 2500;
 
-export function Envelope({ label, onOpen, disabled = false }: { label: string; onOpen: () => Promise<ReactNode>; disabled?: boolean }) {
+type Opened = { label: string; content: ReactNode };
+
+export function Envelope({ label, onOpen, disabled = false, closeLabel }: { label: string; onOpen: () => Promise<ReactNode>; disabled?: boolean; closeLabel?: string }) {
   // l'etichetta resta quella della busta aperta anche se il genitore passa già la prossima
-  const [opened, setOpened] = useState<{ label: string; content: ReactNode } | null>(null);
+  const [opened, setOpened] = useState<Opened | null>(null);
+  const [closed, setClosed] = useState<Opened | null>(null);
   const [error, setError] = useState<string | null>(null);
   const content = useRef<HTMLDivElement>(null);
+  const envelope = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (opened) content.current?.focus();
-  }, [opened]);
+    else if (closed) envelope.current?.focus();
+  }, [opened, closed]);
+  const shown = opened ?? closed;
   const { armed, pending, click } = useConfirm(async () => {
     setError(null);
+    if (closed) return setOpened(closed);
     try {
       setOpened({ label, content: await onOpen() });
     } catch (err) {
@@ -41,7 +49,7 @@ export function Envelope({ label, onOpen, disabled = false }: { label: string; o
         <div className="env-flap" />
       </div>
       <div className="env-part env-front">
-        <span className="env-label">{opened?.label ?? label}</span>
+        <span className="env-label">{shown?.label ?? label}</span>
       </div>
       <div className="env-seal">
         <SealMark />
@@ -56,7 +64,7 @@ export function Envelope({ label, onOpen, disabled = false }: { label: string; o
 
   return (
     <div className="mb-8">
-      <section aria-label={opened?.label ?? label} aria-live="polite" className="env-stage" data-open={opened ? "" : undefined}>
+      <section aria-label={shown?.label ?? label} aria-live="polite" className="env-stage" data-open={opened ? "" : undefined}>
         <div className="env-glow" aria-hidden="true" />
         {opened ? (
           <>
@@ -67,12 +75,13 @@ export function Envelope({ label, onOpen, disabled = false }: { label: string; o
           </>
         ) : (
           <button
+            ref={envelope}
             type="button"
             className="env"
             onClick={click}
             disabled={pending || disabled}
             aria-busy={pending || undefined}
-            aria-label={`${label}. ${hint}`}
+            aria-label={`${shown?.label ?? label}. ${hint}`}
             data-armed={armed || undefined}
             data-pending={pending || undefined}
           >
@@ -81,6 +90,19 @@ export function Envelope({ label, onOpen, disabled = false }: { label: string; o
           </button>
         )}
       </section>
+      {opened && closeLabel && (
+        <div className="mt-3 text-center">
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setClosed(opened);
+              setOpened(null);
+            }}
+          >
+            {closeLabel}
+          </Button>
+        </div>
+      )}
       {error && <Notice tone="error">{error}</Notice>}
     </div>
   );

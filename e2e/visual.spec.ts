@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test";
-import { expect, expectNoHorizontalScroll, loginAs, seed, test, type Player, type Scenario } from "./helpers";
+import { expect, expectNoHorizontalScroll, loginAs, scheduleNext, seed, test, type Player, type Scenario } from "./helpers";
 import { isoToRomeLocal } from "../src/lib/format";
 
 const SEASON = "/cineforums/1/seasons/1";
@@ -26,6 +26,25 @@ async function opened(page: Page, name: RegExp) {
   await openEnvelope(page, name);
   const caption = page.locator(".env-content .envelope-caption").last();
   await expect.poll(() => caption.evaluate((e) => getComputedStyle(e).opacity), { timeout: 5000 }).toBe("1");
+}
+
+/** La busta del film c'è solo con la proiezione programmata; a busta aperta si salta il conto alla rovescia. */
+async function scheduled(page: Page) {
+  await scheduleNext(page, `/api${SEASON}`);
+  await page.reload();
+}
+async function filmOpened(page: Page) {
+  await scheduled(page);
+  await openEnvelope(page, /Film n\. 1/);
+  await page.getByRole("button", { name: "Salta il conto alla rovescia" }).click();
+  const caption = page.locator(".env-content .envelope-caption");
+  await expect.poll(() => caption.evaluate((e) => getComputedStyle(e).opacity), { timeout: 5000 }).toBe("1");
+}
+async function countdown(page: Page) {
+  await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+  await scheduled(page);
+  await openEnvelope(page, /Film n\. 1/);
+  await page.waitForTimeout(3300);
 }
 
 /** A metà apertura: lembo aperto, busta che scende, locandina che sale. */
@@ -68,8 +87,9 @@ const SHOTS: Shot[] = [
   { name: "profile", scenario: "base", as: "anna", path: "/profile" },
   { name: "season-open", scenario: "open", as: "anna", path: SEASON },
   { name: "season-screening", scenario: "screening", as: "anna", path: SEASON },
-  { name: "season-screening-opened", scenario: "screening", as: "anna", path: SEASON, setup: (p) => opened(p, /Film n\. 1/), motion: true },
-  { name: "season-screening-midway", scenario: "screening", as: "anna", path: SEASON, setup: (p) => midway(p, /Film n\. 1/), instant: true, motion: true },
+  { name: "season-screening-opened", scenario: "screening", as: "anna", path: SEASON, setup: filmOpened, motion: true },
+  { name: "season-screening-midway", scenario: "screening", as: "anna", path: SEASON, setup: async (p) => (await scheduled(p), midway(p, /Film n\. 1/)), instant: true, motion: true },
+  { name: "season-screening-countdown", scenario: "screening", as: "anna", path: SEASON, setup: countdown, instant: true, motion: true },
   { name: "season-final", scenario: "final", as: "anna", path: SEASON },
   { name: "season-final-opened", scenario: "final", as: "anna", path: SEASON, setup: (p) => opened(p, /^Miglior film\./), motion: true },
   { name: "season-final-midway", scenario: "final", as: "anna", path: SEASON, setup: (p) => midway(p, /^Miglior film\./), instant: true, motion: true },

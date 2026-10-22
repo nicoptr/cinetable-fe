@@ -39,6 +39,7 @@ export function NextScreening({ base, next }: { base?: string; next: Next | null
   }
   return (
     <Section title="Prossima proiezione" className="mb-8">
+      {!next && <p className="mb-3 text-muted">Fissa data e luogo della serata: poi potrai aprire la busta del film.</p>}
       <ScreeningForm
         screeningAt={next?.screeningAt ?? null}
         location={next?.location ?? null}

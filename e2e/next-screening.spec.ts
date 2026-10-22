@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test";
-import { expect, expectNoHorizontalScroll, loginAs, seed, test, type Player } from "./helpers";
+import { expect, expectNoHorizontalScroll, loginAs, scheduleAndReveal, seed, test, type Player } from "./helpers";
 import { formatDateTime, formatLongDateTime, isoToRomeLocal, romeLocalToIso } from "../src/lib/format";
 
 const SEASON = "/cineforums/1/seasons/1";
@@ -91,19 +91,15 @@ test("senza proiezione programmata il membro non vede la card", async ({ page })
   await expect(card(page)).toHaveCount(0);
 });
 
-test("Apri il voto: prima serve la data, poi compare da solo all'orario della proiezione", async ({ page }) => {
+test("Apri il voto compare da solo all'orario della proiezione", async ({ page }) => {
   seed("screening");
   await loginAs(page, "anna");
+  const at = new Date(Date.now() + 2 * 60000);
+  at.setSeconds(0, 0);
+  expect((await page.request.post(`${API}/next-screening`, { data: { screeningAt: at.toISOString(), location: "Sala Verdi" } })).ok()).toBe(true);
   expect((await page.request.post(`${API}/reveal-next`)).ok()).toBe(true);
   await page.clock.install();
   await page.goto(`${SEASON}/films/1`);
-  await expect(page.getByText("Fissa prima la proiezione")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Apri il voto" })).toHaveCount(0);
-
-  const at = new Date(Date.now() + 2 * 60000);
-  at.setSeconds(0, 0);
-  expect((await page.request.patch(`${API}/program/1/screening`, { data: { screeningAt: at.toISOString(), location: "Sala Verdi" } })).ok()).toBe(true);
-  await page.reload();
   await expect(page.getByText(`Potrai aprire il voto dopo la proiezione del ${formatLongDateTime(at.toISOString())}`)).toBeVisible();
   await expect(page.getByRole("button", { name: "Apri il voto" })).toHaveCount(0);
   await page.clock.fastForward("03:00");
@@ -113,7 +109,7 @@ test("Apri il voto: prima serve la data, poi compare da solo all'orario della pr
 test("la proiezione del film svelato non può andare oltre quella del prossimo: errore sotto la data", async ({ page }) => {
   seed("screening");
   await loginAs(page, "anna");
-  expect((await page.request.post(`${API}/reveal-next`)).ok()).toBe(true);
+  await scheduleAndReveal(page, API);
   expect((await page.request.post(`${API}/next-screening`, { data: { screeningAt: future(4).iso, location: "Casa di Anna" } })).ok()).toBe(true);
   await page.goto(`${SEASON}/films/1`);
   await page.getByLabel("Data e ora").fill(future(5).local);
