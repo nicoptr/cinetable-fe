@@ -89,9 +89,20 @@ type FieldProps = { label: string; error?: string | null; hint?: string } & (
   | ({ textarea: true } & TextareaHTMLAttributes<HTMLTextAreaElement>)
 );
 
+function EyeIcon({ crossed }: { crossed: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+      <circle cx="12" cy="12" r="3" />
+      {crossed && <path d="M4 4l16 16" />}
+    </svg>
+  );
+}
+
 export function Field({ label, error, hint, className = "", ...props }: FieldProps) {
   const { textarea, ...rest } = props;
   const id = useId();
+  const [shown, setShown] = useState(false);
   const describedBy = [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean).join(" ") || undefined;
   const control = `w-full rounded border bg-surface px-3 py-2.5 text-base text-ink placeholder:text-muted ${error ? "border-error" : "border-line"} ${className}`;
   const aria = { id, "aria-invalid": error ? true : undefined, "aria-describedby": describedBy };
@@ -103,6 +114,19 @@ export function Field({ label, error, hint, className = "", ...props }: FieldPro
       </label>
       {textarea ? (
         <textarea {...(rest as TextareaHTMLAttributes<HTMLTextAreaElement>)} {...aria} className={`${control} min-h-28`} />
+      ) : (rest as InputHTMLAttributes<HTMLInputElement>).type === "password" ? (
+        <div className="relative">
+          <input {...(rest as InputHTMLAttributes<HTMLInputElement>)} {...aria} type={shown ? "text" : "password"} className={`${control} min-h-11 pr-12`} />
+          <button
+            type="button"
+            onClick={() => setShown(!shown)}
+            className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded text-muted hover:text-gold"
+          >
+            <EyeIcon crossed={shown} />
+            {/* testo e non aria-label: getByLabel("Password") deve trovare solo il campo */}
+            <span className="sr-only">{shown ? "Nascondi la password" : "Mostra la password"}</span>
+          </button>
+        </div>
       ) : (
         <input {...(rest as InputHTMLAttributes<HTMLInputElement>)} {...aria} className={`${control} min-h-11`} />
       )}

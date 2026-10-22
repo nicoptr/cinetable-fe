@@ -130,3 +130,17 @@ test("con la sessione la home offre 'Vai ai tuoi cineforum'", async ({ page }) =
   await page.getByRole("link", { name: "Vai ai tuoi cineforum" }).first().click();
   await expect(page.getByRole("heading", { name: "I miei cineforum" })).toBeVisible();
 });
+
+test("l'occhio mostra e nasconde la password, in login e in registrazione", async ({ page }) => {
+  for (const path of ["/login", "/signup"]) {
+    await page.goto(path);
+    const password = page.getByLabel("Password", { exact: true });
+    await password.fill("segreta123");
+    await expect(password).toHaveAttribute("type", "password");
+    await page.getByRole("button", { name: "Mostra la password" }).click();
+    await expect(password).toHaveAttribute("type", "text");
+    await expect(password).toHaveValue("segreta123");
+    await page.getByRole("button", { name: "Nascondi la password" }).click();
+    await expect(password).toHaveAttribute("type", "password");
+  }
+});
