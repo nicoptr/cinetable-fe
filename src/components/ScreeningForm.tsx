@@ -26,7 +26,15 @@ export function ScreeningForm({ screeningAt, location, busy, error, submitLabel,
       }}
     >
       <Field label="Data e ora" name="at" type="datetime-local" defaultValue={screeningAt ? isoToRomeLocal(screeningAt) : ""} error={error} required />
-      <Field label="Luogo" name="location" defaultValue={location ?? ""} maxLength={200} required />
+      <Field
+        label="Dove"
+        name="location"
+        defaultValue={location ?? ""}
+        placeholder="Es. Casa di Anna, via Roma 12"
+        hint="Comparirà così nell'email, sotto «Dove»: basta il posto, senza «a» o «da» davanti."
+        maxLength={200}
+        required
+      />
       <Button type="submit" pending={busy} pendingLabel="Salvataggio…" className="w-full">
         {submitLabel}
       </Button>

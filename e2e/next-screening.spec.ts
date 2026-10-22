@@ -33,16 +33,16 @@ test("anna programma la proiezione prima di svelare, la modifica, svela e il fil
   await page.goto(SEASON);
   const first = future(2);
   await card(page).getByLabel("Data e ora").fill(first.local);
-  await card(page).getByLabel("Luogo").fill("Casa di Carla");
+  await card(page).getByLabel("Dove").fill("Casa di Carla");
   await card(page).getByRole("button", { name: "Programma" }).click();
   await expect(card(page)).toContainText(`${formatLongDateTime(first.iso)} · Casa di Carla`);
   await expect(card(page)).toContainText(CATEGORY);
 
   const second = future(3);
   await card(page).getByRole("button", { name: "Modifica" }).click();
-  await expect(card(page).getByLabel("Luogo")).toHaveValue("Casa di Carla");
+  await expect(card(page).getByLabel("Dove")).toHaveValue("Casa di Carla");
   await card(page).getByLabel("Data e ora").fill(second.local);
-  await card(page).getByLabel("Luogo").fill("Casa di Anna");
+  await card(page).getByLabel("Dove").fill("Casa di Anna");
   await card(page).getByRole("button", { name: "Programma" }).click();
   await expect(card(page)).toContainText(`${formatLongDateTime(second.iso)} · Casa di Anna`);
   expect((await season(page)).nextScreening).toMatchObject({ screeningAt: second.iso, location: "Casa di Anna" });
@@ -64,7 +64,7 @@ test("una data nel passato: l'errore resta sotto il campo", async ({ page }) => 
   await loginAs(page, "anna");
   await page.goto(SEASON);
   await card(page).getByLabel("Data e ora").fill(future(-1).local);
-  await card(page).getByLabel("Luogo").fill("Casa di Anna");
+  await card(page).getByLabel("Dove").fill("Casa di Anna");
   await card(page).getByRole("button", { name: "Programma" }).click();
   await expect(card(page).getByText("La proiezione non può essere nel passato")).toBeVisible();
   await expect(card(page).getByLabel("Data e ora")).toHaveAttribute("aria-invalid", "true");
@@ -117,7 +117,7 @@ test("la proiezione del film svelato non può andare oltre quella del prossimo: 
   expect((await page.request.post(`${API}/next-screening`, { data: { screeningAt: future(4).iso, location: "Casa di Anna" } })).ok()).toBe(true);
   await page.goto(`${SEASON}/films/1`);
   await page.getByLabel("Data e ora").fill(future(5).local);
-  await page.getByLabel("Luogo").fill("Sala Verdi");
+  await page.getByLabel("Dove").fill("Sala Verdi");
   await page.getByRole("button", { name: "Salva la proiezione" }).click();
   await expect(page.getByText("La proiezione deve essere prima di quella già programmata per il prossimo film")).toBeVisible();
   await expect(page.getByLabel("Data e ora")).toHaveAttribute("aria-invalid", "true");

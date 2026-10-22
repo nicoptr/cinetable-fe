@@ -83,7 +83,7 @@ test("programmo la proiezione e apro il voto; bruno vota con gli slider", async 
   await expect(page.getByRole("heading", { name: item.movie.title, level: 1 })).toBeVisible();
 
   await page.getByLabel("Data e ora").fill(isoToRomeLocal(new Date(Date.now() - 86400000).toISOString()));
-  await page.getByLabel("Luogo").fill("Sala Verdi");
+  await page.getByLabel("Dove").fill("Sala Verdi");
   await page.getByRole("button", { name: "Salva la proiezione" }).click();
   await expect(page.getByText("Sala Verdi")).toBeVisible();
   const open = page.getByRole("button", { name: "Apri il voto" });
