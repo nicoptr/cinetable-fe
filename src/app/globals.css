@@ -1012,84 +1012,6 @@ button.env[data-pending] .env-seal {
   color: var(--color-gold);
 }
 
-/* provala: la busta finta */
-.demo-env {
-  position: relative;
-  width: min(300px, 82%);
-  aspect-ratio: 16 / 10;
-  margin: 10px auto 20px;
-  perspective: 800px;
-  transition: margin 0.8s 0.8s;
-}
-.demo-env[data-open] {
-  margin-bottom: 140px;
-}
-.demo-body {
-  position: absolute;
-  inset: 0;
-  border-radius: 10px;
-  background: linear-gradient(160deg, #efe6d6, #d8cbb3);
-  box-shadow: 0 24px 40px rgb(0 0 0 / 0.6);
-  transition:
-    translate 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s,
-    opacity 0.5s 0.9s;
-}
-.demo-flap {
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  clip-path: polygon(0 0, 100% 0, 50% 58%);
-  transform-origin: 50% 0;
-  border-radius: 10px 10px 0 0;
-  background: linear-gradient(180deg, #e2d6c0, #c9b99c);
-  transition:
-    transform 0.7s ease 0.2s,
-    opacity 0.3s ease 0.75s;
-}
-.demo-env .wax {
-  z-index: 3;
-  width: 54px;
-  height: 54px;
-  box-shadow: 0 4px 10px rgb(0 0 0 / 0.45);
-  transition:
-    scale 0.3s,
-    opacity 0.3s;
-}
-.demo-winner {
-  position: absolute;
-  z-index: 4;
-  inset: -10px 8% auto;
-  visibility: hidden;
-  opacity: 0;
-  translate: 0 30px;
-  pointer-events: none;
-  transition:
-    opacity 0.6s,
-    translate 1s cubic-bezier(0.2, 0.8, 0.2, 1),
-    visibility 0s 0.6s;
-}
-.demo-env[data-open] .wax {
-  scale: 1.4;
-  opacity: 0;
-}
-.demo-env[data-open] .demo-flap {
-  transform: rotateX(180deg);
-  opacity: 0;
-}
-.demo-env[data-open] .demo-body {
-  translate: 0 60px;
-  opacity: 0;
-}
-.demo-env[data-open] .demo-winner {
-  visibility: visible;
-  opacity: 1;
-  translate: 0 0;
-  transition:
-    opacity 0.6s 1s,
-    translate 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s,
-    visibility 0s;
-}
-
 .faq details {
   border-top: 1px solid var(--color-line);
 }
@@ -1132,12 +1054,6 @@ button.env[data-pending] .env-seal {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .demo-env,
-  .demo-env * {
-    transition-delay: 0s !important;
-  }
-}
 
 /* Stampa, su ogni pagina (pensata per la scheda dell'edizione): fondo bianco, testo nero, niente menu */
 @media print {

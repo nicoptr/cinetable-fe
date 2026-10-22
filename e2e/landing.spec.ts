@@ -25,19 +25,21 @@ test("da loggato i link portano ai propri cineforum", async ({ page }) => {
   await expect(page.getByRole("link", { name: /Accedi|Crea il tuo cineforum|Ho già un account/ })).toHaveCount(0);
 });
 
-test("Provala: la busta si apre e si richiude", async ({ page }) => {
+test("Provala: la busta fa il conto alla rovescia, mostra il film e si richiude", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
-  const winner = page.getByText("Cars - Motori ruggenti", { exact: true });
-  await expect(winner).toBeHidden();
-  await expect(page.getByRole("button", { name: "Apri la busta" })).toHaveAttribute("aria-expanded", "false");
-  await page.getByRole("button", { name: "Apri la busta" }).click();
-  await expect(page.getByRole("button", { name: "Richiudi" })).toHaveAttribute("aria-expanded", "true");
-  await expect(winner).toBeVisible();
-  await expect(page.getByText("proposto da Nicola · media 99")).toBeVisible();
-  await expect(page.getByRole("img", { name: "Locandina di Cars - Motori ruggenti" })).toBeVisible();
-  await page.getByRole("button", { name: "Richiudi" }).click();
-  await expect(winner).toBeHidden();
-  await expect(page.getByRole("button", { name: "Apri la busta" })).toBeVisible();
+  const envelope = page.getByRole("button", { name: /^Miglior film\./ });
+  await envelope.click();
+  await envelope.click();
+  const stage = page.getByRole("region", { name: "Miglior film" });
+  await expect(stage.locator(".leader-num")).toHaveText("5");
+  await page.getByRole("button", { name: "Salta il conto alla rovescia" }).click();
+  await expect(stage.getByRole("heading", { name: "Cars - Motori ruggenti" })).toBeVisible();
+  await expect(stage.getByText("proposto da Nicola · media 99")).toBeVisible();
+  await expect(stage.getByRole("img", { name: "Cars - Motori ruggenti" })).toBeVisible();
+  await page.getByRole("button", { name: "Richiudi la busta" }).click();
+  await expect(stage.getByRole("heading", { name: "Cars - Motori ruggenti" })).toHaveCount(0);
+  await expect(envelope).toBeVisible();
 });
 
 test("una domanda frequente si apre", async ({ page }) => {
