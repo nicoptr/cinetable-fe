@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AwardReveal } from "@/components/AwardReveal";
 import { AwardWinners } from "@/components/AwardWinners";
 import { Envelope } from "@/components/Envelope";
+import { Replayable } from "@/components/Replayable";
 import { Avatar, Poster, Section } from "@/components/ui";
 import { api } from "@/lib/api";
 import type { AwardResult, SeasonResults, SeasonView } from "@/lib/types";
@@ -70,7 +71,9 @@ export function FinalNight({
             <section key={a.awardId} aria-label={a.name} className="border-t border-line py-6 text-center first-of-type:border-t-0 first-of-type:pt-0 last:pb-0">
               <h3 className="mb-1 font-serif text-xl text-gold">{a.name}</h3>
               <p className="mb-4 text-sm text-muted">{a.question}</p>
-              <AwardWinners award={a} />
+              <Replayable label={a.name} replay={<AwardReveal award={a} films={films} onDone={() => {}} />}>
+                <AwardWinners award={a} />
+              </Replayable>
             </section>
           ))}
         </Section>

@@ -179,3 +179,41 @@ test("scheda prima della fine → Non trovato", async ({ page }) => {
   await page.goto(`/cineforums/1/seasons/abc/summary`);
   await expect(page.getByRole("heading", { name: "Non trovato" })).toBeVisible();
 });
+
+test("chiunque richiude e riapre la busta di un award già aperto; ricaricando torna aperta", async ({ page }) => {
+  seed("done");
+  await loginAs(page, "bruno");
+  await page.goto(SEASON);
+  const results = page.getByRole("region", { name: "Risultati" });
+  const film = results.getByRole("region", { name: "Miglior film" });
+  await expect(film.getByRole("heading", { level: 4, name: "Fight Club" })).toBeVisible();
+  let opens = 0;
+  page.on("request", (r) => {
+    if (r.method() === "POST" && r.url().includes("/awards/")) opens++;
+  });
+  await film.getByRole("button", { name: "Richiudi la busta" }).click();
+  await expect(film.getByRole("heading", { name: "Fight Club" })).toHaveCount(0);
+  await open(page, "Miglior film");
+  await expect(page.locator(".award-nominees li")).toHaveCount(4, { timeout: 5000 });
+  await skip(page);
+  await expect(film.getByRole("heading", { level: 3, name: "Fight Club" })).toBeVisible();
+  await expect(film.locator(".award-proposer[data-on]")).toContainText("carla", { timeout: 5000 });
+  expect(opens).toBe(0);
+  await page.reload();
+  await expect(results.getByRole("region", { name: "Miglior film" }).getByRole("heading", { level: 4, name: "Fight Club" })).toBeVisible();
+});
+
+test("chiunque richiude e riapre la busta di un film svelato", async ({ page }) => {
+  seed("done");
+  await loginAs(page, "bruno");
+  await page.goto(`${SEASON}/films/3`);
+  await expect(page.getByRole("heading", { level: 1, name: "Fight Club" })).toBeVisible();
+  await page.getByRole("button", { name: "Richiudi la busta" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(0);
+  await open(page, "Film n. 3");
+  const stage = page.getByRole("region", { name: "Film n. 3" });
+  await expect(stage.locator(".leader-num")).toHaveText("5");
+  await page.getByRole("button", { name: "Salta il conto alla rovescia" }).click();
+  await expect(stage.getByRole("heading", { name: "Fight Club" })).toBeVisible();
+  await expect(stage).toContainText("Film n. 3");
+});
