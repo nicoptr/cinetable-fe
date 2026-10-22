@@ -1,13 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export const backendServer = {
-  command: "cd ../cinofili-be && set -a && . ./.env.e2e && set +a && npx prisma migrate deploy && node dist/src/main.js",
+  command: "cd ../cinetable-be && set -a && . ./.env.e2e && set +a && npx prisma migrate deploy && node dist/src/main.js",
   url: "http://localhost:5055/docs/json",
   reuseExistingServer: !process.env.CI,
   timeout: 120_000,
 };
 
-// Backend e frontend dedicati agli e2e (porte 5055/3055, DB cinofili_e2e): i test condividono il DB, quindi un solo worker.
+// Backend e frontend dedicati agli e2e (porte 5055/3055, DB cinetable_e2e): i test condividono il DB, quindi un solo worker.
 export default defineConfig({
   testDir: "e2e",
   workers: 1,

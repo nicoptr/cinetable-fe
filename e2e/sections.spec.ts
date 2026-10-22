@@ -98,9 +98,9 @@ test("dalle pagine dell'edizione si torna al cineforum", async ({ page }) => {
   await loginAs(page, "anna");
   for (const path of ["/cineforums/1/seasons/1", "/cineforums/1/seasons/1/films/1", "/cineforums/1/seasons/1/summary"]) {
     await page.goto(path);
-    await expect(page.getByRole("link", { name: "Cinofili del giovedì" })).toHaveAttribute("href", "/cineforums/1");
+    await expect(page.getByRole("link", { name: "Cinefili del giovedì" })).toHaveAttribute("href", "/cineforums/1");
   }
-  await page.getByRole("link", { name: "Cinofili del giovedì" }).click();
+  await page.getByRole("link", { name: "Cinefili del giovedì" }).click();
   await expect(page).toHaveURL(/\/cineforums\/1$/);
 });
 

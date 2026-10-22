@@ -24,7 +24,7 @@ test.describe("sipario", () => {
     await loginAs(page, "anna");
     await page.goto("/cineforums");
     const states = await recordCurtain(page);
-    await page.getByRole("link", { name: /Cinofili del giovedì/ }).click();
+    await page.getByRole("link", { name: /Cinefili del giovedì/ }).click();
     await expect(curtain(page)).toHaveAttribute("data-state", /closing|closed/);
     await expect(page).toHaveURL("/cineforums/1");
     await expect(curtain(page)).toHaveAttribute("data-state", "open");
@@ -55,7 +55,7 @@ test("con prefers-reduced-motion il sipario non compare", async ({ page }) => {
   await loginAs(page, "anna");
   await page.goto("/cineforums");
   const states = await recordCurtain(page);
-  await page.getByRole("link", { name: /Cinofili del giovedì/ }).click();
+  await page.getByRole("link", { name: /Cinefili del giovedì/ }).click();
   await expect(page).toHaveURL("/cineforums/1");
   await expect(curtain(page)).toBeHidden();
   expect(await states()).toEqual([]);

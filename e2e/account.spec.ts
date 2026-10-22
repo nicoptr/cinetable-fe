@@ -56,7 +56,7 @@ test("registrazione da invito: email bloccata e si entra nel cineforum", async (
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Crea l'account" }).click();
   await page.waitForURL(/\/cineforums\/1$/);
-  await expect(page.getByRole("heading", { name: "Cinofili del giovedì" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cinefili del giovedì" })).toBeVisible();
 });
 
 test("verifica email con il token del seed → dentro l'app", async ({ page }) => {

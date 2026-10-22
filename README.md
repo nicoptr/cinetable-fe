@@ -10,7 +10,7 @@ npm install
 npm run dev                 # http://localhost:3000
 ```
 
-Serve il backend `cinofili-be` avviato (`yarn dev`).
+Serve il backend `cinetable-be` avviato (`yarn dev`).
 
 ## Deploy
 
@@ -51,10 +51,10 @@ Il frontend gira su Vercel, il backend è pubblico ma risponde solo a chi conosc
 
 Una volta sola:
 
-1. nel backend: crea il DB `cinofili_e2e`, `cp .env.e2e.example .env.e2e` con le credenziali locali, `yarn install && yarn build`;
+1. nel backend: crea il DB `cinetable_e2e`, `cp .env.e2e.example .env.e2e` con le credenziali locali, `yarn install && yarn build`;
 2. qui: `npx playwright install chromium`.
 
-Poi `npm run e2e`. Playwright avvia il backend (porta 5055, applica le migrazioni su `cinofili_e2e`) e `next dev` (porta 3055) e li riusa se sono già accesi. Il `next dev` degli e2e scrive in `.next-e2e` (`NEXT_DIST_DIR`): Next 16 non avvia un secondo `next dev` sulla stessa cartella, così gli e2e girano anche con `npm run dev` acceso. Ricompila il backend (`yarn build`) dopo averlo modificato. Ogni test parte da `seed(scenario)` (`e2e/helpers.ts`), che svuota e ricrea il DB e2e con `cinofili-be/scripts/e2e-seed.js`: gli scenari e i dati sono descritti in testa a quello script.
+Poi `npm run e2e`. Playwright avvia il backend (porta 5055, applica le migrazioni su `cinetable_e2e`) e `next dev` (porta 3055) e li riusa se sono già accesi. Il `next dev` degli e2e scrive in `.next-e2e` (`NEXT_DIST_DIR`): Next 16 non avvia un secondo `next dev` sulla stessa cartella, così gli e2e girano anche con `npm run dev` acceso. Ricompila il backend (`yarn build`) dopo averlo modificato. Ogni test parte da `seed(scenario)` (`e2e/helpers.ts`), che svuota e ricrea il DB e2e con `cinetable-be/scripts/e2e-seed.js`: gli scenari e i dati sono descritti in testa a quello script.
 
 Gli e2e girano solo su Chromium con il viewport dell'iPhone 13 (`devices["iPhone 13"]`): WebKit/Safari non è coperto. Gli spec importano `test` ed `expect` da `e2e/helpers.ts`, non da `@playwright/test`: quel `test` dà a ogni test un `X-Forwarded-For` diverso, così i rate limit per IP del backend non si sommano. Il backend e2e ha `TRUST_PROXY=1`: Next è l'unico hop fra il test e il backend e inoltra l'`X-Forwarded-For` del test così com'è, quindi il backend legge proprio quel valore.
 

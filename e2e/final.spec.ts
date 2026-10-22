@@ -7,7 +7,7 @@ test.use({ reducedMotion: "no-preference" });
 const SEASON = "/cineforums/1/seasons/1";
 const SUMMARY = `${SEASON}/summary`;
 
-// voti fissi del seed (cinofili-be/scripts/e2e-seed.js): medie arrotondate a una cifra
+// voti fissi del seed (cinetable-be/scripts/e2e-seed.js): medie arrotondate a una cifra
 const FILMS = [
   { title: "La cosa", proposer: "anna", film: "68,3", direction: "90,0" },
   { title: "Ghostbusters", proposer: "bruno", film: "55,0", direction: "45,0" },

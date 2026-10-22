@@ -4,7 +4,7 @@ test("creo un cineforum e lo trovo nell'elenco come presidente", async ({ page }
   seed("base");
   await loginAs(page, "bruno");
   await page.goto("/cineforums");
-  await expect(page.getByRole("link", { name: /Cinofili del giovedì/ })).toContainText("Membro");
+  await expect(page.getByRole("link", { name: /Cinefili del giovedì/ })).toContainText("Membro");
   await page.getByLabel("Nome").fill("Cineclub di Bruno");
   await page.getByLabel("Descrizione").fill("Il martedì sera");
   await page.getByRole("button", { name: "Crea il cineforum" }).click();
@@ -18,7 +18,7 @@ test("creo un cineforum e lo trovo nell'elenco come presidente", async ({ page }
 test("invitato nuovo: dal link alla registrazione, poi dentro il cineforum", async ({ page }) => {
   seed("base");
   await page.goto(`/invite?token=${INVITE_TOKEN_NEW}`);
-  await expect(page.getByText("anna ti invita in Cinofili del giovedì")).toBeVisible();
+  await expect(page.getByText("anna ti invita in Cinefili del giovedì")).toBeVisible();
   await page.getByRole("link", { name: "Crea il tuo account" }).click();
   await expect(page.getByLabel("Email", { exact: true })).toHaveValue("ospite@e2e.it");
   await expect(page.getByLabel("Email", { exact: true })).not.toBeEditable();
@@ -26,7 +26,7 @@ test("invitato nuovo: dal link alla registrazione, poi dentro il cineforum", asy
   await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Crea l'account" }).click();
   await page.waitForURL(/\/cineforums\/1$/);
-  await expect(page.getByRole("heading", { name: "Cinofili del giovedì" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cinefili del giovedì" })).toBeVisible();
 });
 
 test("invito con token non valido", async ({ page }) => {

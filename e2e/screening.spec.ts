@@ -6,7 +6,7 @@ test.use({ reducedMotion: "no-preference" });
 
 const SEASON = "/cineforums/1/seasons/1";
 const API = `/api${SEASON}`;
-// chi ha candidato cosa nel seed (cinofili-be/scripts/e2e-seed.js)
+// chi ha candidato cosa nel seed (cinetable-be/scripts/e2e-seed.js)
 const PROPOSER: Record<number, Player> = { 1091: "anna", 620: "bruno", 550: "carla", 11216: "dario" };
 const TITLES = /La cosa|Ghostbusters|Fight Club|Nuovo Cinema Paradiso/;
 
