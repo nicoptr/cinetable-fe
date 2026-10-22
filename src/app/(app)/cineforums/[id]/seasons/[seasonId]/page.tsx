@@ -8,6 +8,7 @@ import { Draft } from "./_draft";
 import { FinalNight } from "./_final";
 import { NextScreening } from "./_next";
 import { Open } from "./_open";
+import { SeasonRecap } from "./_recap";
 import { RevealNext } from "./_reveal";
 import { Screening } from "./_screening";
 
@@ -91,6 +92,7 @@ export default async function SeasonPage({ params }: { params: Promise<{ id: str
       ) : (
         <Screening base={base} season={s} />
       )}
+      {s.status !== "DRAFT" && <SeasonRecap season={s} />}
     </>
   );
 }

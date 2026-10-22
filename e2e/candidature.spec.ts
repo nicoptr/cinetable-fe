@@ -37,7 +37,8 @@ test("bruno cerca e candida un film: vede la locandina e lo stato valido", async
   await page.goto(SEASON);
   await expect(page.getByText("Chiusura candidature:")).toBeVisible();
   await expect(page.getByText("La tua categoria")).toBeVisible();
-  await expect(page.getByText("Commedia italiana")).toBeVisible();
+  const myCategory = page.locator("section.card").filter({ hasText: "La tua categoria" });
+  await expect(myCategory.getByText("Commedia italiana")).toBeVisible();
   await expect(page.getByText("Tienila segreta")).toBeVisible();
   await expect(page.getByText("0 film su 4")).toBeVisible();
   await pickViaUi(page, "Ghostbusters");
@@ -90,8 +91,9 @@ test("anna (presidente) vede chi manca ma mai i film degli altri", async ({ page
   await switchTo(page, "anna");
   await page.goto(SEASON);
   await expect(page.getByText("Chi manca")).toBeVisible();
-  await expect(page.getByText("carla")).toBeVisible();
-  await expect(page.getByText("bruno")).toHaveCount(0);
+  const missing = page.locator("section.card").filter({ hasText: "Chi manca" });
+  await expect(missing.getByText("carla")).toBeVisible();
+  await expect(missing.getByText("bruno")).toHaveCount(0);
   await expect(page.getByText("1 film su 4")).toBeVisible();
   await expect(page.getByText("Ghostbusters")).toHaveCount(0);
   await expect(page.getByText("Sposta la scadenza")).toBeVisible();
@@ -145,4 +147,18 @@ test("Altri risultati aggiunge la pagina 2 dello stesso termine", async ({ page 
   await page.getByRole("button", { name: "Altri risultati" }).click();
   await expect(page.getByRole("button", { name: /Nuovo Cinema Paradiso/ })).toBeVisible();
   await expect(page.getByRole("button", { name: /La cosa/ })).toBeVisible();
+});
+
+test("ogni membro vede partecipanti, categorie e award dell'edizione, senza chi ha quale categoria", async ({ page }) => {
+  seed("open");
+  await loginAs(page, "bruno");
+  await page.goto("/cineforums/1/seasons/1");
+  const recap = page.getByRole("region", { name: "L'edizione" });
+  await expect(recap.getByRole("heading", { name: "Partecipanti · 4" })).toBeVisible();
+  for (const name of ["anna", "bruno", "carla", "dario", "Horror anni '80", "Commedia italiana", "Miglior film", "Miglior regia"]) {
+    await expect(recap).toContainText(name);
+  }
+  await expect(recap.getByRole("heading", { name: "Categorie · 2" })).toBeVisible();
+  await expect(recap.getByRole("heading", { name: "Award · 2" })).toBeVisible();
+  await expect(recap.getByRole("listitem").filter({ hasText: "anna" })).not.toContainText(/Horror|Commedia/);
 });

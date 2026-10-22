@@ -2,10 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Avatar, Button, ConfirmButton, Notice, Section } from "@/components/ui";
+import { Button, ConfirmButton, Notice, Section } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 import type { SeasonView } from "@/lib/types";
 import { SeasonForm } from "../SeasonForm";
+import { SeasonRecap } from "./_recap";
 
 type Editor = { members: { userId: number; username: string }[]; categories: { id: number; name: string }[]; awards: { id: number; name: string }[] };
 
@@ -40,22 +41,7 @@ export function Draft({ cineforumId, season, members, categories, awards }: { ci
   return (
     <>
       {season.description && <p className="mb-4">{season.description}</p>}
-      <Section title="Categorie">
-        <p className="text-muted">{season.categories.map((c) => c.name).join(", ")}</p>
-      </Section>
-      <Section title="Award">
-        <p className="text-muted">{season.awards.map((a) => a.name).join(", ")}</p>
-      </Section>
-      <Section title="Partecipanti">
-        <ul className="flex flex-wrap gap-x-4">
-          {season.participants.map((p) => (
-            <li key={p.userId} className="flex min-h-11 items-center gap-2 text-muted">
-              <Avatar name={p.username} url={p.avatarUrl} />
-              {p.username}
-            </li>
-          ))}
-        </ul>
-      </Section>
+      <SeasonRecap season={season} />
       {season.myRole === "PRESIDENT" ? (
         <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
           <ConfirmButton
