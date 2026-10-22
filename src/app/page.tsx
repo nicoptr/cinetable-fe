@@ -200,7 +200,7 @@ export default async function Home() {
 
       <section className={section}>
         <p className="eyebrow rise mb-2.5">Perché funziona</p>
-        <h2 className="rise mb-6 text-[32px] leading-tight">Il gusto della sorpresa, ogni settimana</h2>
+        <h2 className="rise mb-6 text-[32px] leading-tight">Il gusto della sorpresa, ad ogni proiezione</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {FEATURES.map((f) => (
             <div key={f.title} className="card rise mt-0!">
