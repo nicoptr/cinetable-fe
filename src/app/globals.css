@@ -650,7 +650,7 @@ button.env[data-pending] .env-seal {
 
 /*
  * Svelamento di un film (cineforums/.../_reveal.tsx): dalla busta esce lo schermo del conto alla rovescia,
- * 5…1 da 1 s a partire da 1900 ms (LEADER_START_MS); poi la pellicola scorre e si ferma sul film (1200 ms).
+ * 5…1 da 1 s a partire da 1900 ms (LEADER_START_MS); poi la pellicola scorre e si ferma sul film (1800 ms).
  * Locandina, titolo e didascalia si montano a fine conto: i loro ritardi `.env-*` contano da lì.
  */
 .env-film {
@@ -745,6 +745,7 @@ button.env[data-pending] .env-seal {
   width: 15.5rem;
   height: calc(13rem * 1.5 + 1rem);
   overflow: hidden;
+  box-shadow: 0 14px 40px rgb(201 162 74 / 0.3);
 }
 .reel {
   position: absolute;
@@ -754,7 +755,8 @@ button.env[data-pending] .env-seal {
   gap: 1rem;
   padding: 0.5rem 1.25rem;
   background: #0b0a09;
-  animation: reel 1200ms cubic-bezier(0.15, 0.6, 0.2, 1) both;
+  will-change: transform;
+  animation: reel 1800ms cubic-bezier(0.4, 0.1, 0.25, 1) both;
 }
 .reel::before,
 .reel::after {
@@ -783,8 +785,15 @@ button.env[data-pending] .env-seal {
 .reel-frame-lit {
   background: radial-gradient(ellipse, #d6cbb4, #8a7d66);
 }
-.env-film:has(.reel) {
-  filter: drop-shadow(0 14px 40px rgb(201 162 74 / 0.3));
+/* titolo, riflesso e didascalia del film arrivano a pellicola ferma */
+.env-stage[data-open] .env-content:has(.reel) .envelope-title {
+  animation-delay: 1700ms;
+}
+.env-stage[data-open] .env-content:has(.reel) .envelope-poster::after {
+  animation-delay: 1900ms;
+}
+.env-stage[data-open] .env-content:has(.reel) .envelope-caption {
+  animation-delay: 2100ms;
 }
 @property --sweep {
   syntax: "<angle>";

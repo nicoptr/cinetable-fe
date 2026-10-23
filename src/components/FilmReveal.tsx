@@ -13,6 +13,10 @@ const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").match
 export function FilmReveal({ movie, caption }: { movie: { title: string; originalTitle?: string; posterUrl: string | null }; caption: ReactNode }) {
   const [count, setCount] = useState(() => (reducedMotion() ? 0 : COUNT[0]));
   const [skipped, setSkipped] = useState(false);
+  // la locandina parte fuori dalla finestra della pellicola: caricata ora, è pronta quando scorre
+  useEffect(() => {
+    if (movie.posterUrl) new Image().src = movie.posterUrl;
+  }, [movie.posterUrl]);
   useEffect(() => {
     if (reducedMotion() || skipped) return;
     const timers = [...COUNT.slice(1), 0].map((k, i) => setTimeout(() => setCount(k), LEADER_START_MS + (i + 1) * LEADER_STEP_MS));
