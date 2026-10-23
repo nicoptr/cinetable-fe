@@ -30,7 +30,9 @@ export function ProfileForm({ username: u, avatarUrl: a }: { username: string; a
   const router = useRouter();
   const [username, setUsername] = useState(u);
   const [avatarUrl, setAvatarUrl] = useState(a);
+  const [saved, setSaved] = useState(a);
   const [preview, setPreview] = useState(a.startsWith("https://") ? a : "");
+  const [broken, setBroken] = useState<string | null>(null);
   // l'anteprima parte dopo una pausa o al blur, non a ogni tasto
   useEffect(() => {
     const t = setTimeout(() => setPreview(avatarUrl.startsWith("https://") ? avatarUrl : ""), 600);
@@ -39,20 +41,41 @@ export function ProfileForm({ username: u, avatarUrl: a }: { username: string; a
   const { submit, pending, notice } = useSubmit(
     async () => {
       await api("/users/me", { quiet: true, method: "PATCH", body: { username: username.trim(), avatarUrl: avatarUrl.trim() || null } });
+      setSaved(avatarUrl);
       router.refresh(); // nome e avatar nel menu
     },
     "Profilo aggiornato",
   );
+  const previewBroken = !!preview && broken === preview;
+  const unsaved = !!preview && !previewBroken && avatarUrl.trim() !== saved.trim();
   return (
     <form onSubmit={submit}>
       {notice}
       <Field label="Nome utente" autoComplete="username" required value={username} onChange={(e) => setUsername(e.target.value)} />
-      <Field label="Avatar (URL https)" type="url" pattern="https://.*" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} onBlur={() => setPreview(avatarUrl.startsWith("https://") ? avatarUrl : "")} />
-      {preview && (
+      <Field
+        label="Avatar (URL https)"
+        type="url"
+        pattern="https://.*"
+        value={avatarUrl}
+        onChange={(e) => setAvatarUrl(e.target.value)}
+        onBlur={() => setPreview(avatarUrl.startsWith("https://") ? avatarUrl : "")}
+        hint={unsaved ? "Questa è solo l'anteprima: salva il profilo per usarla." : undefined}
+        error={previewBroken ? "Questo link non apre un'immagine. Serve l'indirizzo dell'immagine stessa: tasto destro sulla foto, poi \"Copia indirizzo immagine\"." : undefined}
+      />
+      {preview && !previewBroken && (
         // eslint-disable-next-line @next/next/no-img-element -- anteprima di un URL esterno arbitrario
-        <img src={preview} alt="Anteprima avatar" className="mb-5 size-16 rounded-full border border-line object-cover" />
+        <img
+          src={preview}
+          alt="Anteprima avatar"
+          // un errore arrivato prima dell'idratazione non passa da onError: lo si legge dall'immagine
+          ref={(img) => {
+            if (img?.complete && img.naturalWidth === 0) setBroken(preview);
+          }}
+          onError={() => setBroken(preview)}
+          className="mb-5 size-16 rounded-full border border-line object-cover"
+        />
       )}
-      <Button type="submit" pending={pending} pendingLabel="Salvataggio…" className="w-full">
+      <Button type="submit" pending={pending} pendingLabel="Salvataggio…" disabled={previewBroken} className="w-full">
         Salva il profilo
       </Button>
     </form>
