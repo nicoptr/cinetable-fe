@@ -3,9 +3,10 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logo, SealMark, Wordmark } from "@/components/Logo";
+import { SITE } from "@/lib/site";
 import { DemoEnvelope, RiseOnScroll } from "./_landing";
 
-const TITLE = "Cinetable";
+const TITLE = "Cinetable · Il gioco del cineforum tra amici";
 const DESCRIPTION =
   "Il cineforum tra amici: candidate un film in segreto, guardatelo insieme una sera alla volta e votate. Nella serata finale si aprono le buste, come agli Oscar.";
 
@@ -14,7 +15,28 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
-  openGraph: { title: TITLE, description: DESCRIPTION, type: "website", locale: "it_IT", url: "/" },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: "website",
+    locale: "it_IT",
+    url: "/",
+    siteName: "Cinetable",
+  },
+  verification: { google: "6OEXloIsCw7hDhczG3V_lnsLubPwa6Ww5XaWU0vr5WU" },
+};
+
+// dati strutturati per i motori di ricerca: cos'è il sito e che è gratuito
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Cinetable",
+  url: SITE,
+  description: DESCRIPTION,
+  applicationCategory: "EntertainmentApplication",
+  operatingSystem: "Web",
+  inLanguage: "it",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
 };
 
 const STEPS: { title: string; text: string; chips?: string[] }[] = [
@@ -42,7 +64,11 @@ const STEPS: { title: string; text: string; chips?: string[] }[] = [
 ];
 
 const icon = (paths: ReactNode) => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" className="mb-2.5 size-7 fill-none stroke-gold stroke-[1.6]">
+  <svg
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    className="mb-2.5 size-7 fill-none stroke-gold stroke-[1.6]"
+  >
     {paths}
   </svg>
 );
@@ -91,28 +117,47 @@ const FEATURES = [
 ];
 
 const FAQ = [
-  ["Quanto costa?", "Niente. Cinetable è un progetto tra amici: niente abbonamenti, niente pubblicità."],
-  ["I film si guardano su Cinetable?", "No: Cinetable organizza il gioco. Il film lo guardate voi, insieme, dove e come preferite."],
+  [
+    "Quanto costa?",
+    "Niente. Cinetable è un progetto tra amici: niente abbonamenti, niente pubblicità.",
+  ],
+  [
+    "I film si guardano su Cinetable?",
+    "No: Cinetable organizza il gioco. Il film lo guardate voi, insieme, dove e come preferite.",
+  ],
   [
     "Quanti amici servono?",
     "Almeno due partecipanti per edizione, e il numero dei partecipanti deve essere un multiplo di quello delle categorie. Il limite è la grandezza del vostro divano.",
   ],
-  ["Serve installare qualcosa?", "No. Funziona dal browser, ed è pensato prima di tutto per il telefono."],
+  [
+    "Serve installare qualcosa?",
+    "No. Funziona dal browser, ed è pensato prima di tutto per il telefono.",
+  ],
 ];
 
-const btn = "btn-primary inline-flex min-h-12 items-center justify-center rounded-lg border border-gold px-6 text-[17px] text-gold";
-const textLink = "inline-flex min-h-11 items-center underline underline-offset-4 hover:text-gold";
+const btn =
+  "btn-primary inline-flex min-h-12 items-center justify-center rounded-lg border border-gold px-6 text-[17px] text-gold";
+const textLink =
+  "inline-flex min-h-11 items-center underline underline-offset-4 hover:text-gold";
 const section = "border-t border-line py-14";
 
 export default async function Home() {
   const loggedIn = (await cookies()).has("cinetable_token");
-  const primary = loggedIn ? { href: "/cineforums", label: "Vai ai tuoi cineforum" } : { href: "/signup", label: "Crea il tuo cineforum" };
+  const primary = loggedIn
+    ? { href: "/cineforums", label: "Vai ai tuoi cineforum" }
+    : { href: "/signup", label: "Crea il tuo cineforum" };
 
   return (
     <div data-landing>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+      />
       <RiseOnScroll />
       <noscript>
-        <style>{".rise { opacity: 1 !important; translate: none !important; }"}</style>
+        <style>
+          {".rise { opacity: 1 !important; translate: none !important; }"}
+        </style>
       </noscript>
       <div className="curtain curtain-intro" aria-hidden="true">
         <div className="curtain-panel curtain-left" />
@@ -121,7 +166,10 @@ export default async function Home() {
       </div>
 
       <header className="-mt-6 flex items-center justify-between py-3.5">
-        <Link href="/" className="inline-flex min-h-11 items-center gap-2.5 text-[22px] text-gold">
+        <Link
+          href="/"
+          className="inline-flex min-h-11 items-center gap-2.5 text-[22px] text-gold"
+        >
           <Logo size={34} />
           <Wordmark />
         </Link>
@@ -137,7 +185,11 @@ export default async function Home() {
           <div className="stage-side stage-right" />
           <div className="fan">
             {[-18, -6, 6, 18].map((deg) => (
-              <div key={deg} className="fan-poster" style={{ rotate: `${deg}deg` }}>
+              <div
+                key={deg}
+                className="fan-poster"
+                style={{ rotate: `${deg}deg` }}
+              >
                 ?
               </div>
             ))}
@@ -155,7 +207,8 @@ export default async function Home() {
           <em className="text-gold">Nessuno sa di chi è.</em>
         </h1>
         <p className="mx-auto mb-6.5 max-w-[30em] text-lg text-muted">
-          Candidate un film in segreto, guardatelo insieme una sera alla volta e votate. Nella serata finale si aprono le buste, come agli Oscar.
+          Candidate un film in segreto, guardatelo insieme una sera alla volta e
+          votate. Nella serata finale si aprono le buste, come agli Oscar.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
           <Link href={primary.href} className={`${btn} btn-solid`}>
@@ -165,22 +218,34 @@ export default async function Home() {
             Come si gioca
           </a>
         </div>
-        <p className="mt-3.5 text-sm text-muted">Gratis, senza pubblicità. Dal browser, anche dal telefono.</p>
+        <p className="mt-3.5 text-sm text-muted">
+          Gratis, senza pubblicità. Dal browser, anche dal telefono.
+        </p>
       </section>
 
       <section id="come" className={section}>
         <p className="eyebrow rise mb-2.5">Come si gioca</p>
-        <h2 className="rise mb-3 text-[32px] leading-tight">Cinque passi, dall&apos;invito alla busta</h2>
-        <p className="rise mb-7 text-lg text-muted">Il presidente prepara l&apos;edizione, poi gioca come tutti gli altri.</p>
+        <h2 className="rise mb-3 text-[32px] leading-tight">
+          Cinque passi, dall&apos;invito alla busta
+        </h2>
+        <p className="rise mb-7 text-lg text-muted">
+          Il presidente prepara l&apos;edizione, poi gioca come tutti gli altri.
+        </p>
         <ol className="steps">
           {STEPS.map((s, i) => (
-            <li key={s.title} className="rise grid grid-cols-[44px_1fr] gap-4 pb-6.5">
+            <li
+              key={s.title}
+              className="rise grid grid-cols-[44px_1fr] gap-4 pb-6.5"
+            >
               <span className="step-num">{i + 1}</span>
               <div>
                 <h3 className="mt-1.5 mb-1 text-[22px]">{s.title}</h3>
                 <p className="text-muted">{s.text}</p>
                 {s.chips?.map((c) => (
-                  <span key={c} className="mt-2 mr-1.5 inline-block rounded-full border border-gold/35 px-2.5 py-0.5 text-[13px] text-gold">
+                  <span
+                    key={c}
+                    className="mt-2 mr-1.5 inline-block rounded-full border border-gold/35 px-2.5 py-0.5 text-[13px] text-gold"
+                  >
                     {c}
                   </span>
                 ))}
@@ -192,7 +257,9 @@ export default async function Home() {
 
       <section className={`${section} text-center`}>
         <p className="eyebrow rise mb-2.5">Provala</p>
-        <h2 className="rise mb-3 text-[32px] leading-tight">E l&apos;Oscar per il miglior film va a…</h2>
+        <h2 className="rise mb-3 text-[32px] leading-tight">
+          E l&apos;Oscar per il miglior film va a…
+        </h2>
         <div className="card rise">
           <DemoEnvelope />
         </div>
@@ -200,7 +267,9 @@ export default async function Home() {
 
       <section className={section}>
         <p className="eyebrow rise mb-2.5">Perché funziona</p>
-        <h2 className="rise mb-6 text-[32px] leading-tight">Il gusto della sorpresa, ad ogni proiezione</h2>
+        <h2 className="rise mb-6 text-[32px] leading-tight">
+          Il gusto della sorpresa, ad ogni proiezione
+        </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {FEATURES.map((f) => (
             <div key={f.title} className="card rise mt-0!">
@@ -214,7 +283,9 @@ export default async function Home() {
 
       <section className={`${section} faq`}>
         <p className="eyebrow rise mb-2.5">Domande</p>
-        <h2 className="rise mb-6 text-[32px] leading-tight">Prima di cominciare</h2>
+        <h2 className="rise mb-6 text-[32px] leading-tight">
+          Prima di cominciare
+        </h2>
         {FAQ.map(([q, a]) => (
           <details key={q}>
             <summary>{q}</summary>
@@ -224,8 +295,12 @@ export default async function Home() {
       </section>
 
       <section className={`${section} text-center`}>
-        <h2 className="rise mb-3 text-[32px] leading-tight">Il prossimo giovedì, chi porta il film?</h2>
-        <p className="rise mb-7 text-lg text-muted">Crea il cineforum in un minuto e invita il tuo gruppo.</p>
+        <h2 className="rise mb-3 text-[32px] leading-tight">
+          Il prossimo giovedì, chi porta il film?
+        </h2>
+        <p className="rise mb-7 text-lg text-muted">
+          Crea il cineforum in un minuto e invita il tuo gruppo.
+        </p>
         <div className="rise flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
           <Link href={primary.href} className={`${btn} btn-solid`}>
             {primary.label}
@@ -243,12 +318,20 @@ export default async function Home() {
           <span>Cinetable · il cineforum tra amici</span>
           <span>
             Dati dei film da{" "}
-            <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer" className="text-gold underline underline-offset-4">
+            <a
+              href="https://www.themoviedb.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gold underline underline-offset-4"
+            >
               TMDB
             </a>
           </span>
         </div>
-        <p className="mt-2">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+        <p className="mt-2">
+          This product uses the TMDB API but is not endorsed or certified by
+          TMDB.
+        </p>
       </footer>
     </div>
   );
